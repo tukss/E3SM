@@ -76,7 +76,11 @@ void ManufacturedSolution::init() {
    /// and that only one vertical level is used so only one set of indices is
    /// used here.
    HorzMesh *DefHorzMesh = HorzMesh::getDefault();
+#ifdef USE_CODIPACK
+   R8 H0                 = DefHorzMesh->BottomDepthH(0).getValue();
+#else
    R8 H0                 = DefHorzMesh->BottomDepthH(0);
+#endif
 
    // Define and compute common constants
    R8 Grav    = 9.80665_Real;                          // Gravity acceleration
@@ -128,8 +132,8 @@ void ManufacturedSolution::ManufacturedThicknessTendency::operator()(
 
    parallelFor(
        {Mesh->NCellsAll, NVertLevels}, KOKKOS_LAMBDA(int ICell, int KLevel) {
-          R8 X     = XCell(ICell);
-          R8 Y     = YCell(ICell);
+          R8 X     = XCell(ICell).getValue();
+          R8 Y     = YCell(ICell).getValue();
           R8 Phase = LocKx * X + LocKy * Y - LocAngFreq * ElapsedTimeSec;
           ThicknessTend(ICell, KLevel) +=
               LocEta0 *
@@ -177,19 +181,29 @@ void ManufacturedSolution::ManufacturedVelocityTendency::operator()(
 
    parallelFor(
        {Mesh->NEdgesAll, NVertLevels}, KOKKOS_LAMBDA(int IEdge, int KLevel) {
-          R8 X = XEdge(IEdge);
-          R8 Y = YEdge(IEdge);
+          R8 X = XEdge(IEdge).getValue();
+          R8 Y = YEdge(IEdge).getValue();
 
           R8 Phase       = LocKx * X + LocKy * Y - LocAngFreq * ElapsedTimeSec;
           R8 SourceTerm0 = LocAngFreq * sin(Phase) - 0.5_Real * LocEta0 *
                                                          (LocKx + LocKy) *
                                                          sin(2.0_Real * Phase);
 
+#ifdef USE_CODIPACK
+          Real U = LocEta0 *
+                 ((-FEdge(IEdge) + LocGrav * LocKx) * ::codi::cos((Phase)) + SourceTerm0);
+#else
           R8 U = LocEta0 *
                  ((-FEdge(IEdge) + LocGrav * LocKx) * cos(Phase) + SourceTerm0);
+#endif
+
+#ifdef USE_CODIPACK
+          Real V = LocEta0 *
+                 ((FEdge(IEdge) + LocGrav * LocKy) * ::codi::cos((Phase)) + SourceTerm0);
+#else
           R8 V = LocEta0 *
                  ((FEdge(IEdge) + LocGrav * LocKy) * cos(Phase) + SourceTerm0);
-
+#endif
           // Del2 and del4 source terms
           if (LocVelDiffTendencyEnable) {
              U += LocViscDel2 * LocEta0 * (LocKx2 + LocKy2) * cos(Phase);
@@ -201,9 +215,13 @@ void ManufacturedSolution::ManufacturedVelocityTendency::operator()(
              V -= LocViscDel4 * LocEta0 *
                   ((LocKx4 + LocKy4 + LocKx2 * LocKy2) * cos(Phase));
           }
-
+#ifdef USE_CODIPACK
+          Real NormalCompSourceTerm =
+              cos(AngleEdge(IEdge)) * U + sin(AngleEdge(IEdge)) * V;
+#else
           R8 NormalCompSourceTerm =
               cos(AngleEdge(IEdge)) * U + sin(AngleEdge(IEdge)) * V;
+#endif
           NormalVelTend(IEdge, KLevel) += NormalCompSourceTerm;
        });
 
