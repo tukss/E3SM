@@ -32,6 +32,25 @@ if(OMEGA_SINGLE_PRECISION)
   )
 endif()
 
+find_package(CoDiPack CONFIG  REQUIRED NO_DEFAULT_PATH
+             NO_CMAKE_ENVIRONMENT_PATH
+             NO_SYSTEM_ENVIRONMENT_PATH
+             NO_CMAKE_PACKAGE_REGISTRY
+             NO_CMAKE_BUILDS_PATH
+             NO_CMAKE_SYSTEM_PATH
+             NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+
+if(CoDiPack_FOUND)
+  target_compile_definitions(
+      OmegaLibFlags
+      INTERFACE
+      USE_CODIPACK=1
+  )
+  target_link_libraries(OmegaLibFlags INTERFACE CoDiPack)
+  #target_link_libraries(OmegaLibFlags PUBLIC CoDiPack)
+endif()
+
+
 target_link_options(
     OmegaLibFlags
     INTERFACE
