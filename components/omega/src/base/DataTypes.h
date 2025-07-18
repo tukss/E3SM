@@ -18,6 +18,10 @@
 
 #include "Kokkos_Core.hpp"
 
+#ifdef USE_CODIPACK
+#include <codi.hpp>
+#endif
+
 namespace OMEGA {
 
 // Standard integer and floating point types
@@ -27,16 +31,27 @@ using R4 = float;        ///< alias for 32-bit (single prec) real
 using R8 = double;       ///< alias for 64-bit (double prec) real
 
 /// generic real 64-bit (default) or 32-bit (if -DSINGLE_PRECISION used)
+#ifdef USE_CODIPACK
+using Real = codi::RealReverse;
+#else
 #ifdef OMEGA_SINGLE_PRECISION
 using Real = float;
 #else
 using Real = double;
 #endif
+#endif
 
+#ifdef USE_CODIPACK
+// user-defined literal for generic reals
+KOKKOS_INLINE_FUNCTION constexpr long double operator""_Real(long double x) {
+   return x;
+}
+#else
 // user-defined literal for generic reals
 KOKKOS_INLINE_FUNCTION constexpr Real operator""_Real(long double x) {
    return x;
 }
+#endif
 
 // Aliases for Kokkos memory spaces
 #ifdef OMEGA_ENABLE_CUDA
