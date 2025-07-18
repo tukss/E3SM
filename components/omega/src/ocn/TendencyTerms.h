@@ -325,9 +325,13 @@ class BottomDragOnEdge {
       const I4 JCell0 = CellsOnEdge(IEdge, 0);
       const I4 JCell1 = CellsOnEdge(IEdge, 1);
 
+      #ifdef USE_CODIPACK
+      const Real VelNormEdge =
+          ::codi::sqrt(Real(KECell(JCell0, KBot) + KECell(JCell1, KBot)));
+      #else
       const Real VelNormEdge =
           Kokkos::sqrt(KECell(JCell0, KBot) + KECell(JCell1, KBot));
-
+      #endif
       const Real InvThickEdge = 1._Real / LayerThickEdge(IEdge, KBot);
       Tend(IEdge, KBot) -= EdgeMask(IEdge, KBot) * Coeff * VelNormEdge *
                            InvThickEdge * NormalVelEdge(IEdge, KBot);
