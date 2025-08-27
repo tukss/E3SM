@@ -42,6 +42,12 @@ Omega:
   Tracers:
     Base: [Temperature, Salinity]
     Debug: [Debug1, Debug2, Debug3]
+  Eos:
+    EosType: teos10
+    Linear:
+      DRhoDT: -0.2
+      DRhoDS: 0.8
+      RhoT0S0: 1000.0
   IOStreams:
     # InitialState should only be used when starting from scratch.
     # For restart runs, the frequency units should be changed from

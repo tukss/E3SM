@@ -15,6 +15,7 @@ target_include_directories(
     ${PIOC_SOURCE_DIR}
     ${PIOC_BINARY_DIR}
     ${Parmetis_INCLUDE_DIRS}
+    ${OMEGA_BUILD_DIR}/external/GSW-C
 )
 
 target_compile_definitions(
@@ -32,6 +33,7 @@ if(OMEGA_SINGLE_PRECISION)
   )
 endif()
 
+<<<<<<< HEAD
 find_package(CoDiPack CONFIG  REQUIRED NO_DEFAULT_PATH
              NO_CMAKE_ENVIRONMENT_PATH
              NO_SYSTEM_ENVIRONMENT_PATH
@@ -50,11 +52,19 @@ if(CoDiPack_FOUND)
   #target_link_libraries(OmegaLibFlags PUBLIC CoDiPack)
 endif()
 
+=======
+>>>>>>> E3SM-Project/Omega
 
 target_link_options(
     OmegaLibFlags
     INTERFACE
     ${OMEGA_LINK_OPTIONS}
+)
+
+target_link_directories(
+	OmegaLibFlags
+	INTERFACE
+	${OMEGA_BUILD_DIR}/external/GSW-C
 )
 
 target_link_libraries(
@@ -67,6 +77,7 @@ target_link_libraries(
     parmetis
     metis
     gptl
+    gswteos-10
     pacer
     stdc++fs
     cpptrace::cpptrace
@@ -84,6 +95,10 @@ endif()
 file(GLOB_RECURSE _LIBSRC_FILES infra/*.cpp base/*.cpp ocn/*.cpp timeStepping/*.cpp)
 
 add_library(${OMEGA_LIB_NAME} ${_LIBSRC_FILES})
+
+if(OMEGA_BUILD_TEST)
+  add_dependencies(${OMEGA_LIB_NAME} gswteos)
+endif()
 
 target_link_libraries(
     ${OMEGA_LIB_NAME}

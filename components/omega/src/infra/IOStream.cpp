@@ -493,13 +493,8 @@ Error IOStream::create(const std::string &StreamName, //< [in] name of stream
 
    } // end if IOFreqUnits
    // If an alarm is set, attach it to the model clock
-   if (HasAlarm) {
-      int AlarmErr = ModelClock->attachAlarm(&(NewStream->MyAlarm));
-      if (AlarmErr != 0) {
-         ABORT_ERROR("Error attaching alarm to model clock for stream {}",
-                     StreamName);
-      }
-   }
+   if (HasAlarm)
+      ModelClock->attachAlarm(&(NewStream->MyAlarm));
 
    // Check the file frequency to see if there will be multiple records or
    // time slices per file
@@ -559,11 +554,7 @@ Error IOStream::create(const std::string &StreamName, //< [in] name of stream
       // create and attach alarm
       std::string FileAlarmName = StreamName + "File";
       NewStream->FileAlarm      = Alarm(FileAlarmName, FileInt, ClockStart);
-      int AlarmErr = ModelClock->attachAlarm(&(NewStream->FileAlarm));
-      if (AlarmErr != 0) {
-         ABORT_ERROR("Error attaching file alarm to model clock for stream {}",
-                     StreamName);
-      }
+      ModelClock->attachAlarm(&(NewStream->FileAlarm));
 
       // Check for
    } // end multiframe
@@ -594,14 +585,8 @@ Error IOStream::create(const std::string &StreamName, //< [in] name of stream
       std::string EndName   = StreamName + "End";
       NewStream->StartAlarm = Alarm(StartName, Start);
       NewStream->EndAlarm   = Alarm(EndName, End);
-      int AlarmErr          = ModelClock->attachAlarm(&(NewStream->StartAlarm));
-      if (AlarmErr != 0)
-         ABORT_ERROR("Error attaching start alarm to model clock for stream {}",
-                     StreamName);
-      AlarmErr = ModelClock->attachAlarm(&(NewStream->EndAlarm));
-      if (AlarmErr != 0)
-         ABORT_ERROR("Error attaching end alarm to model clock for stream {}",
-                     StreamName);
+      ModelClock->attachAlarm(&(NewStream->StartAlarm));
+      ModelClock->attachAlarm(&(NewStream->EndAlarm));
    } // endif UseStartEnd
 
    // Now we add the list of field names to the stream
@@ -909,6 +894,7 @@ int IOStream::writeFieldMeta(
 
       } else if (MetaVal.type() == typeid(bool)) {
          bool MetaValBool = std::any_cast<bool>(MetaVal);
+         // bool is coerced to int in write
          Err = IO::writeMeta(MetaName, MetaValBool, FileID, FieldID);
 
       } else if (MetaVal.type() == typeid(std::string)) {
@@ -1696,15 +1682,23 @@ int IOStream::readFieldData(
    case ArrayDataType::I4:
       DataI4.resize(LocSize);
       DataPtr = DataI4.data();
+      break;
    case ArrayDataType::I8:
       DataI8.resize(LocSize);
       DataPtr = DataI8.data();
+      break;
    case ArrayDataType::R4:
       DataR4.resize(LocSize);
       DataPtr = DataR4.data();
+      break;
    case ArrayDataType::R8:
       DataR8.resize(LocSize);
       DataPtr = DataR8.data();
+      break;
+   case ArrayDataType::Unknown:
+      ABORT_ERROR("Unknown data array type");
+   default:
+      ABORT_ERROR("Invalid data array type");
    }
 
    // read data into vector
@@ -2284,7 +2278,6 @@ int IOStream::readFieldData(
       LOG_ERROR("Invalid data type while reading field {} for stream {}",
                 FieldName, Name);
       return Fail;
-      break;
 
    } // end switch data type
 
@@ -2388,6 +2381,15 @@ int IOStream::readStream(
       } else if (MetaTmp.type() == typeid(R4)) {
          ErrRead = IO::readMeta(MetaName, MetaValR4, InFileID, IO::GlobalID);
          ReqMetadata[MetaName] = MetaValR4;
+      } else if (MetaTmp.type() == typeid(bool)) {
+         // bool must be read as int
+         ErrRead = IO::readMeta(MetaName, MetaValI4, InFileID, IO::GlobalID);
+         if (MetaValI4 == 0) {
+            MetaValBool = false;
+         } else {
+            MetaValBool = true;
+         }
+         ReqMetadata[MetaName] = MetaValBool;
       } else if (MetaTmp.type() == typeid(std::string)) {
          ErrRead = IO::readMeta(MetaName, MetaValStr, InFileID, IO::GlobalID);
          ReqMetadata[MetaName] = MetaValStr;
@@ -2495,7 +2497,7 @@ int IOStream::writeStream(
    // Update the time field with elapsed time since simulation start
    TimeInterval ElapsedTime = SimTime - StartTime;
    R8 ElapsedTimeR8;
-   Err = ElapsedTime.get(ElapsedTimeR8, TimeUnits::Seconds);
+   ElapsedTime.get(ElapsedTimeR8, TimeUnits::Seconds);
    HostArray1DR8 OutTime("OutTime", 1);
    OutTime(0) = ElapsedTimeR8;
    Err        = Field::attachFieldData("time", OutTime);
@@ -2828,11 +2830,7 @@ std::string IOStream::buildFilename(
    I8 ISecW;
    I8 ISecN;
    I8 ISecD;
-   int Err =
-       FileTime.get(IYear, IMonth, IDay, IHour, IMin, ISecW, ISecN, ISecD);
-   if (Err != 0) {
-      LOG_ERROR("Error getting components of simulation time for filename");
-   }
+   FileTime.get(IYear, IMonth, IDay, IHour, IMin, ISecW, ISecN, ISecD);
 
    // Convert these to strings (will pad with zeros if needed later)
    std::string SYear  = std::to_string(IYear);

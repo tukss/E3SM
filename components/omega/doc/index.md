@@ -30,6 +30,7 @@ userGuide/Logging
 userGuide/Driver
 userGuide/Decomp
 userGuide/Dimension
+userGuide/EOS
 userGuide/Error
 userGuide/Field
 userGuide/IO
@@ -62,6 +63,7 @@ devGuide/DataTypes
 devGuide/MachEnv
 devGuide/Config
 devGuide/Driver
+devGuide/EOS
 devGuide/Broadcast
 devGuide/CMakeBuild
 devGuide/Logging
@@ -91,6 +93,7 @@ devGuide/TridiagonalSolvers
 :maxdepth: 1
 
 design/OmegaV0ShallowWater
+design/OmegaV1GoverningEqns
 design/Broadcast
 design/Config
 design/DataTypes
@@ -116,6 +119,7 @@ design/Timers
 design/TimeStepping
 design/Tracers
 design/TridiagonalSolver
+design/VertCoord
 design/VerticalMixingCoeff
 
 design/Template

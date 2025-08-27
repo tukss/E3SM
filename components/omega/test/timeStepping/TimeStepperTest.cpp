@@ -40,8 +40,6 @@
 
 using namespace OMEGA;
 
-// Geometry doesn't matter for this test
-constexpr Geometry Geom = Geometry::Planar;
 // Only one vertical level is needed
 constexpr int NVertLevels = 1;
 
@@ -193,11 +191,7 @@ int initTimeStepperTest(const std::string &mesh) {
    Tendencies::init();
 
    // finish initializing default time stepper
-   int TSErr = TimeStepper::init2();
-   if (TSErr != 0) {
-      Err++;
-      LOG_ERROR("error initializing default time stepper");
-   }
+   TimeStepper::init2();
 
    // Default time stepper never used and time stepper tests require
    // the no calendar option, so we reset calendar here
