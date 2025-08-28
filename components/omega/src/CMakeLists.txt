@@ -33,7 +33,6 @@ if(OMEGA_SINGLE_PRECISION)
   )
 endif()
 
-<<<<<<< HEAD
 find_package(CoDiPack CONFIG  REQUIRED NO_DEFAULT_PATH
              NO_CMAKE_ENVIRONMENT_PATH
              NO_SYSTEM_ENVIRONMENT_PATH
@@ -52,8 +51,6 @@ if(CoDiPack_FOUND)
   #target_link_libraries(OmegaLibFlags PUBLIC CoDiPack)
 endif()
 
-=======
->>>>>>> E3SM-Project/Omega
 
 target_link_options(
     OmegaLibFlags
