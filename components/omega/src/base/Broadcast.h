@@ -33,6 +33,10 @@ int Broadcast(R8 &Value, const MachEnv *InEnv = MachEnv::getDefault(),
               const int RankBcast = -1);
 int Broadcast(R8 &Value, const int RankBcast);
 
+int Broadcast(Real &Value, const MachEnv *InEnv = MachEnv::getDefault(),
+              const int RankBcast = -1);
+int Broadcast(Real &Value, const int RankBcast);
+
 int Broadcast(bool &Value, const MachEnv *InEnv = MachEnv::getDefault(),
               const int RankBcast = -1);
 int Broadcast(bool &Value, const int RankBcast);
