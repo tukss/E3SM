@@ -29,8 +29,13 @@ class VelocityDel2AuxVars {
       const int JVertex1 = VerticesOnEdge(IEdge, 1);
 
       const Real InvDcEdge = 1._Real / DcEdge(IEdge);
+#ifdef USE_CODIPACK
+      const Real InvDvEdge =
+          1._Real / Kokkos::max(DvEdge(IEdge), Real(0.25_Real * DcEdge(IEdge)));
+#else
       const Real InvDvEdge =
           1._Real / Kokkos::max(DvEdge(IEdge), 0.25_Real * DcEdge(IEdge));
+#endif
 
       for (int KVec = 0; KVec < VecLength; ++KVec) {
          const int K = KStart + KVec;
