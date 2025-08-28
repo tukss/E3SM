@@ -78,6 +78,89 @@ class Teos10Eos {
    /// Calculate pressure polynomial coefficients for TEOS-10
    KOKKOS_FUNCTION void calcPCoeffs(Array2DReal SpecVolPCoeffs, const I4 K,
                                     const Real Ct, const Real Sa) const {
+#ifdef USE_CODIPACK
+      constexpr PassiveReal SAu    = 40.0 * 35.16504 / 35.0;
+      constexpr PassiveReal CTu    = 40.0;
+      constexpr PassiveReal DeltaS = 24.0;
+      Real Ss               = codi::sqrt((Sa + DeltaS) / SAu);
+      Real Tt               = Ct / CTu;
+
+      /// Coefficients for the polynomial expansion
+      constexpr PassiveReal V000 = 1.0769995862e-03;
+      constexpr PassiveReal V100 = -3.1038981976e-04;
+      constexpr PassiveReal V200 = 6.6928067038e-04;
+      constexpr PassiveReal V300 = -8.5047933937e-04;
+      constexpr PassiveReal V400 = 5.8086069943e-04;
+      constexpr PassiveReal V500 = -2.1092370507e-04;
+      constexpr PassiveReal V600 = 3.1932457305e-05;
+      constexpr PassiveReal V010 = -1.5649734675e-05;
+      constexpr PassiveReal V110 = 3.5009599764e-05;
+      constexpr PassiveReal V210 = -4.3592678561e-05;
+      constexpr PassiveReal V310 = 3.4532461828e-05;
+      constexpr PassiveReal V410 = -1.1959409788e-05;
+      constexpr PassiveReal V510 = 1.3864594581e-06;
+      constexpr PassiveReal V020 = 2.7762106484e-05;
+      constexpr PassiveReal V120 = -3.7435842344e-05;
+      constexpr PassiveReal V220 = 3.5907822760e-05;
+      constexpr PassiveReal V320 = -1.8698584187e-05;
+      constexpr PassiveReal V420 = 3.8595339244e-06;
+      constexpr PassiveReal V030 = -1.6521159259e-05;
+      constexpr PassiveReal V130 = 2.4141479483e-05;
+      constexpr PassiveReal V230 = -1.4353633048e-05;
+      constexpr PassiveReal V330 = 2.2863324556e-06;
+      constexpr PassiveReal V040 = 6.9111322702e-06;
+      constexpr PassiveReal V140 = -8.7595873154e-06;
+      constexpr PassiveReal V240 = 4.3703680598e-06;
+      constexpr PassiveReal V050 = -8.0539615540e-07;
+      constexpr PassiveReal V150 = -3.3052758900e-07;
+      constexpr PassiveReal V060 = 2.0543094268e-07;
+      constexpr PassiveReal V001 = -1.6784136540e-05;
+      constexpr PassiveReal V101 = 2.4262468747e-05;
+      constexpr PassiveReal V201 = -3.4792460974e-05;
+      constexpr PassiveReal V301 = 3.7470777305e-05;
+      constexpr PassiveReal V401 = -1.7322218612e-05;
+      constexpr PassiveReal V501 = 3.0927427253e-06;
+      constexpr PassiveReal V011 = 1.8505765429e-05;
+      constexpr PassiveReal V111 = -9.5677088156e-06;
+      constexpr PassiveReal V211 = 1.1100834765e-05;
+      constexpr PassiveReal V311 = -9.8447117844e-06;
+      constexpr PassiveReal V411 = 2.5909225260e-06;
+      constexpr PassiveReal V021 = -1.1716606853e-05;
+      constexpr PassiveReal V121 = -2.3678308361e-07;
+      constexpr PassiveReal V221 = 2.9283346295e-06;
+      constexpr PassiveReal V321 = -4.8826139200e-07;
+      constexpr PassiveReal V031 = 7.9279656173e-06;
+      constexpr PassiveReal V131 = -3.4558773655e-06;
+      constexpr PassiveReal V231 = 3.1655306078e-07;
+      constexpr PassiveReal V041 = -3.4102187482e-06;
+      constexpr PassiveReal V141 = 1.2956717783e-06;
+      constexpr PassiveReal V051 = 5.0736766814e-07;
+      constexpr PassiveReal V002 = 3.0623833435e-06;
+      constexpr PassiveReal V102 = -5.8484432984e-07;
+      constexpr PassiveReal V202 = -4.8122251597e-06;
+      constexpr PassiveReal V302 = 4.9263106998e-06;
+      constexpr PassiveReal V402 = -1.7811974727e-06;
+      constexpr PassiveReal V012 = -1.1736386731e-06;
+      constexpr PassiveReal V112 = -5.5699154557e-06;
+      constexpr PassiveReal V212 = 5.4620748834e-06;
+      constexpr PassiveReal V312 = -1.3544185627e-06;
+      constexpr PassiveReal V022 = 2.1305028740e-06;
+      constexpr PassiveReal V122 = 3.9137387080e-07;
+      constexpr PassiveReal V222 = -6.5731104067e-07;
+      constexpr PassiveReal V032 = -4.6132540037e-07;
+      constexpr PassiveReal V132 = 7.7618888092e-09;
+      constexpr PassiveReal V042 = -6.3352916514e-08;
+      constexpr PassiveReal V003 = -3.8088938393e-07;
+      constexpr PassiveReal V103 = 3.6310188515e-07;
+      constexpr PassiveReal V203 = 1.6746303780e-08;
+      constexpr PassiveReal V013 = -3.6527006553e-07;
+      constexpr PassiveReal V113 = -2.7295696237e-07;
+      constexpr PassiveReal V023 = 2.8695905159e-07;
+      constexpr PassiveReal V004 = 8.8302421514e-08;
+      constexpr PassiveReal V104 = -1.1147125423e-07;
+      constexpr PassiveReal V014 = 3.1454099902e-07;
+      constexpr PassiveReal V005 = 4.2369007180e-09;
+#else
       constexpr Real SAu    = 40.0 * 35.16504 / 35.0;
       constexpr Real CTu    = 40.0;
       constexpr Real DeltaS = 24.0;
@@ -159,7 +242,7 @@ class Teos10Eos {
       constexpr Real V104 = -1.1147125423e-07;
       constexpr Real V014 = 3.1454099902e-07;
       constexpr Real V005 = 4.2369007180e-09;
-
+#endif
       SpecVolPCoeffs(5, K) = V005;
       SpecVolPCoeffs(4, K) = V014 * Tt + V104 * Ss + V004;
       SpecVolPCoeffs(3, K) =
@@ -204,7 +287,11 @@ class Teos10Eos {
    KOKKOS_FUNCTION Real calcDelta(const Array2DReal &SpecVolPCoeffs, const I4 K,
                                   const Real P) const {
 
+#ifdef USE_CODIPACK                                    
+      constexpr PassiveReal Pu = 1e4;
+#else                                    
       constexpr Real Pu = 1e4;
+#endif
       Real Pp           = P / Pu;
 
       Real Delta = ((((SpecVolPCoeffs(5, K) * Pp + SpecVolPCoeffs(4, K)) * Pp +
@@ -220,6 +307,15 @@ class Teos10Eos {
 
    /// Calculate reference profile for TEOS-10
    KOKKOS_FUNCTION Real calcRefProfile(Real P) const {
+#ifdef USE_CODIPACK
+      constexpr PassiveReal Pu  = 1e4;
+      constexpr PassiveReal V00 = -4.4015007269e-05;
+      constexpr PassiveReal V01 = 6.9232335784e-06;
+      constexpr PassiveReal V02 = -7.5004675975e-07;
+      constexpr PassiveReal V03 = 1.7009109288e-08;
+      constexpr PassiveReal V04 = -1.6884162004e-08;
+      constexpr PassiveReal V05 = 1.9613503930e-09;
+#else
       constexpr Real Pu  = 1e4;
       constexpr Real V00 = -4.4015007269e-05;
       constexpr Real V01 = 6.9232335784e-06;
@@ -227,6 +323,7 @@ class Teos10Eos {
       constexpr Real V03 = 1.7009109288e-08;
       constexpr Real V04 = -1.6884162004e-08;
       constexpr Real V05 = 1.9613503930e-09;
+#endif
       Real Pp            = P / Pu;
 
       Real V0 =
