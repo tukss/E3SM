@@ -246,6 +246,26 @@ Error Config::get(const std::string &VarName, // [in] name of variable to get
 }
 
 //------------------------------------------------------------------------------
+// Retrieves an CodiPack real value from the Config based on name
+// Returns a fail error code if the variable does not exist
+Error Config::get(const std::string &VarName, // [in] name of variable to get
+                  Real &Value                   // [out] value of the variable
+) {
+   Error Err; // success error code
+
+   // Extract variable from config
+   if (Node[VarName]) { // the variable exists
+      Value.setValue(Node[VarName].as<R8>());
+   } else {
+      Value.setValue(-99999.999);
+      RETURN_ERROR(Err, ErrorCode::Fail,
+                   "Config get R8: could not find variable {}", VarName);
+   }
+
+   return Err;
+}
+
+//------------------------------------------------------------------------------
 // Retrieves a logical/boolean value from the Config based on name
 // Returns a fail error code if the variable does not exist
 Error Config::get(const std::string &VarName, // [in] name of variable to get
@@ -437,6 +457,44 @@ Error Config::get(const std::string &VarName, // [in] name of variable to get
    return Err;
 
 } // End get R8 vector
+
+//------------------------------------------------------------------------------
+// Retrieves a vector of CoDiPack Real values from the Config based on name
+// Returns a fail error code if the variable does not exist
+Error Config::get(const std::string &VarName, // [in] name of variable to get
+                  std::vector<Real> &Vector     // [out] vector to retrieve
+) {
+   Error Err; // success error code
+
+   // Extract variable from config
+   // First check if it exists and verify that it is a sequence node
+   if (Node[VarName]) {                    // the variable exists
+      YAML::Node Sequence = Node[VarName]; // extract as a node
+
+      // if it is a sequence node, copy the sequence into a vector
+      if (Sequence.IsSequence()) {
+
+         // Determine size and resize vector to fit
+         int VecSize = Sequence.size();
+         Vector.resize(VecSize);
+
+         // Now copy the sequence into the vector
+         for (int i = 0; i < VecSize; ++i) {
+            Vector[i].setValue(Sequence[i].as<R8>());
+         }
+
+      } else { // not a sequence (vector) so log an error
+         RETURN_ERROR(Err, ErrorCode::Fail,
+                      "Config get CoDiPack Real vector: entry not a sequence {}", VarName);
+      }
+   } else { // Node with that name does not exist
+      RETURN_ERROR(Err, ErrorCode::Fail,
+                   "Config get CoDiPack Real vector: could not find variable {}", VarName);
+   }
+
+   return Err;
+
+} // End get CoDiPack vector
 
 //------------------------------------------------------------------------------
 // Retrieves a boolean vector from the Config based on name
