@@ -137,6 +137,12 @@ class Config {
              R8 &Value                   ///< [out] value of the variable
    );
 
+   /// Retrieves an 8-byte real value from the Config based on name
+   /// Returns a non-zero error code if the variable does not exist
+   Error get(const std::string &VarName, ///< [in] name of variable to get
+             Real &Value                   ///< [out] value of the variable
+   );
+
    /// Retrieves a logical/boolean value from the Config based on name
    /// Returns a non-zero error code if the variable does not exist
    Error get(const std::string &VarName, ///< [in] name of variable to get
@@ -171,6 +177,12 @@ class Config {
    /// Returns a non-zero error code if the variable does not exist
    Error get(const std::string &VarName, ///< [in] name of vector to get
              std::vector<R8> &Values     ///< [out] vector of values to retrieve
+   );
+
+   /// Retrieves a vector of CoDiPack Real values from the Config by name
+   /// Returns a non-zero error code if the variable does not exist
+   Error get(const std::string &VarName, ///< [in] name of vector to get
+             std::vector<Real> &Values     ///< [out] vector of values to retrieve
    );
 
    /// Retrieves a vector of logical/boolean values from the Config by name
