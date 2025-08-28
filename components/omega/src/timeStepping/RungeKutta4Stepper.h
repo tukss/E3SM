@@ -45,15 +45,15 @@ class RungeKutta4Stepper : public TimeStepper {
    Array3DReal ProvisTracers;
 
    /// Runge-Kutta coefficients
-   Real RKA[NStages];
-   Real RKB[NStages];
-   Real RKC[NStages];
+   PassiveReal RKA[NStages];
+   PassiveReal RKB[NStages];
+   PassiveReal RKC[NStages];
 
    // Projection factors for each RK stage. These are the RKC coefficients
    // shifted by one RK stage and represent the fraction of the timestep over
    // which fields are projected from the old state to the state at the end of a
    // RK stage.
-   Real RKProj[NStages];
+   PassiveReal RKProj[NStages];
 };
 
 } // namespace OMEGA
