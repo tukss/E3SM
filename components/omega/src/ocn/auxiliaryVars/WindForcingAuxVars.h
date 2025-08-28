@@ -24,8 +24,13 @@ class WindForcingAuxVars {
       const Real MeridStressEdge = Interp(IEdge, MeridStressCell, InterpChoice);
 
       NormalStressEdge(IEdge) =
+#ifdef USE_CODIPACK
+          ::codi::cos(AngleEdge(IEdge)) * ZonalStressEdge +
+          ::codi::sin(AngleEdge(IEdge)) * MeridStressEdge;
+#else
           Kokkos::cos(AngleEdge(IEdge)) * ZonalStressEdge +
           Kokkos::sin(AngleEdge(IEdge)) * MeridStressEdge;
+#endif
    }
 
    void registerFields(const std::string &AuxGroupName,
