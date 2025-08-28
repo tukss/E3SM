@@ -42,9 +42,15 @@ class RungeKutta4Stepper : public TimeStepper {
    Array3DReal ProvisTracers;
 
    /// Runge-Kutta coefficients
+#ifdef USE_CODIPACK
+   PassiveReal RKA[NStages];
+   PassiveReal RKB[NStages];
+   PassiveReal RKC[NStages];
+#else
    Real RKA[NStages];
    Real RKB[NStages];
    Real RKC[NStages];
+#endif
 };
 
 } // namespace OMEGA
