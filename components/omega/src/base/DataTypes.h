@@ -33,6 +33,11 @@ using R8 = double;       ///< alias for 64-bit (double prec) real
 /// generic real 64-bit (default) or 32-bit (if -DSINGLE_PRECISION used)
 #ifdef USE_CODIPACK
 using Real = codi::RealReverse;
+#ifdef OMEGA_SINGLE_PRECISION
+using PassiveReal = float;
+#else
+using PassiveReal = double;
+#endif
 #else
 #ifdef OMEGA_SINGLE_PRECISION
 using Real = float;
