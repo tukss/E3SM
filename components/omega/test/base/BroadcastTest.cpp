@@ -9,6 +9,7 @@
 //
 //===-----------------------------------------------------------------------===/
 
+#include "DataTypes.h"
 #include "Broadcast.h"
 #include "Error.h"
 #include "Logging.h"
@@ -35,6 +36,11 @@ void TestBroadcast(MachEnv *DefEnv, MachEnv *AltEnv, std::string TypeName) {
       FromVal = "a";
       ToVal   = "b";
 
+#ifdef USE_CODIPACK
+   } if constexpr (std::is_same_v<MyType, codi::RealReverse>) {
+      FromVal.setValue(1);
+      ToVal.setValue(-1);
+#endif
    } else {
       FromVal = 1;
       ToVal   = -1;
