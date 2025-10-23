@@ -22,6 +22,17 @@
 #include <codi.hpp>
 #endif
 
+#ifdef USE_MEDIPACK
+#include <medi/medi.hpp>
+#include <codi.hpp>
+#include <codi/tools/mpi/codiMpiTypes.hpp>
+ 
+#include <iostream>
+ 
+using namespace medi;
+
+#endif
+
 namespace OMEGA {
 
 // Standard integer and floating point types
@@ -105,6 +116,7 @@ using HostMemInvLayout = MemInvLayout;
    MAKE_OMEGA_VIEW_DIMS(N, V, I8, ML, MS)   \
    MAKE_OMEGA_VIEW_DIMS(N, V, R4, ML, MS)   \
    MAKE_OMEGA_VIEW_DIMS(N, V, R8, ML, MS)   \
+   MAKE_OMEGA_VIEW_DIMS(N, V, PassiveReal, ML, MS)\
    MAKE_OMEGA_VIEW_DIMS(N, V, Real, ML, MS)
 
 // Aliases for Kokkos device arrays of various dimensions and types
