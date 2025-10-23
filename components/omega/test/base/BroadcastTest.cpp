@@ -10,6 +10,7 @@
 //
 //===-----------------------------------------------------------------------===/
 
+#include "DataTypes.h"
 #include "Broadcast.h"
 #include "mpi.h"
 
@@ -32,6 +33,11 @@ void TestBroadcast(OMEGA::MachEnv *Env, std::string TypeName, int *RetVal) {
       FromVal = "a";
       ToVal   = "b";
 
+#ifdef USE_CODIPACK
+   } if constexpr (std::is_same_v<MyType, codi::RealReverse>) {
+      FromVal.setValue(1);
+      ToVal.setValue(-1);
+#endif
    } else {
       FromVal = 1;
       ToVal   = -1;
