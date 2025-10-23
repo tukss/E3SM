@@ -51,6 +51,31 @@ if(CoDiPack_FOUND)
   #target_link_libraries(OmegaLibFlags PUBLIC CoDiPack)
 endif()
 
+find_package(MPI REQUIRED)
+
+find_package(MeDiPack CONFIG  REQUIRED NO_DEFAULT_PATH
+             NO_CMAKE_ENVIRONMENT_PATH
+             NO_SYSTEM_ENVIRONMENT_PATH
+             NO_CMAKE_PACKAGE_REGISTRY
+             NO_CMAKE_BUILDS_PATH
+             NO_CMAKE_SYSTEM_PATH
+             NO_CMAKE_SYSTEM_PACKAGE_REGISTRY)
+
+if(MeDiPack_FOUND)
+  target_compile_definitions(
+      OmegaLibFlags
+      INTERFACE
+      USE_MEDIPACK=1
+  )
+  #add_library(MeDiPack INTERFACE )
+  #target_include_directories(MeDiPack INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
+  #                                                      "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
+  #target_include_directories(MeDiPack INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include") 
+  include_directories(MeDiPack PUBLIC "/pscratch/sd/s/snarayan/MeDiPack/include/")  
+  target_include_directories(MeDiPack INTERFACE "/pscratch/sd/s/snarayan/MeDiPack/include/")                                                    
+  #target_link_libraries(OmegaLibFlags PRIVATE MeDiPack)
+  ##target_link_libraries(OmegaLibFlags PRIVATE MeDiPack)
+endif()
 
 target_link_options(
     OmegaLibFlags
