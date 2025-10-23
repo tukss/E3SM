@@ -66,6 +66,11 @@ int Broadcast(std::vector<R8> &Value,
               const int RankBcast  = -1);
 int Broadcast(std::vector<R8> &Value, const int RankBcast);
 
+int Broadcast(std::vector<Real> &Value,
+              const MachEnv *InEnv = MachEnv::getDefault(),
+              const int RankBcast  = -1);
+int Broadcast(std::vector<Real> &Value, const int RankBcast);
+
 // NOTE: Elements of vector<bool> seem to be non-addressable
 // int Broadcast(std::vector<bool> &Value,
 //              const MachEnv *InEnv = MachEnv::getDefault(),

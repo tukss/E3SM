@@ -75,6 +75,21 @@ int Broadcast(R8 &Value, const int RankBcast) {
 } // end Broadcast
 
 //------------------------------------------------------------------------------
+// Broadcast CoDiPack scalar Value
+int Broadcast(Real &Value, const MachEnv *InEnv, const int RankBcast) {
+   int RetVal, Root;
+
+   Root   = (RankBcast < 0) ? InEnv->getMasterTask() : RankBcast;
+   RetVal = MPI_Bcast(&Value, 1, MPI_DOUBLE, Root, InEnv->getComm());
+
+   return RetVal;
+} // end Broadcast
+
+int Broadcast(Real &Value, const int RankBcast) {
+   return Broadcast(Value, MachEnv::getDefault(), RankBcast);
+} // end Broadcast
+
+//------------------------------------------------------------------------------
 // Broadcast bool scalar Value
 int Broadcast(bool &Value, const MachEnv *InEnv, const int RankBcast) {
    int RetVal, Root;
@@ -182,6 +197,23 @@ int Broadcast(std::vector<R8> &Value, const MachEnv *InEnv,
 int Broadcast(std::vector<R8> &Value, const int RankBcast) {
    return Broadcast(Value, MachEnv::getDefault(), RankBcast);
 }
+
+
+//------------------------------------------------------------------------------
+// Broadcast CoDiPack array
+int Broadcast(std::vector<Real> &Value, const MachEnv *InEnv, const int RankBcast) {
+   int RetVal, Root;
+
+   Root   = (RankBcast < 0) ? InEnv->getMasterTask() : RankBcast;
+   RetVal = MPI_Bcast((void *)Value.data(), Value.size(), MPI_DOUBLE, Root,
+                      InEnv->getComm());
+
+   return RetVal;
+} // end Broadcast
+
+int Broadcast(std::vector<Real> &Value, const int RankBcast) {
+   return Broadcast(Value, MachEnv::getDefault(), RankBcast);
+} // end Broadcast
 
 //------------------------------------------------------------------------------
 // Broadcast bool array
