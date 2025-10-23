@@ -141,8 +141,13 @@ int testKokkosDataTypes(bool LogEnabled) {
 
    Kokkos::initialize();
    {
+#ifndef USE_CODIPACK
+      Array1DPassiveReal test1d("test1dD", d1);
+      Array2DPassiveReal test2d("test2dD", d1, d2);
+#else
       Array1DReal test1d("test1dD", d1);
       Array2DReal test2d("test2dD", d1, d2);
+#endif
 
       TestRun = true;
 
@@ -188,8 +193,13 @@ int testKokkosDataTypes(bool LogEnabled) {
       if (LogEnabled && TestRun)
          RetVal += outputTestResult("Kokkos data type 2", "test2dD", Contains);
 
+#ifndef USE_CODIPACK
+      HostArray1DPassiveReal test1dH("test1dH", d1);
+      HostArray2DPassiveReal test2dH("test2dH", d1, d2);
+#else
       HostArray1DReal test1dH("test1dH", d1);
       HostArray2DReal test2dH("test2dH", d1, d2);
+#endif
 
       if (OMEGA_LOG_LEVEL == 0) {
          LOG_INFO("1d var {}", test1dH);
