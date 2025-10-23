@@ -66,6 +66,11 @@ void Broadcast(std::vector<R8> &Value,
                const int RankBcast  = -1);
 void Broadcast(std::vector<R8> &Value, const int RankBcast);
 
+void Broadcast(std::vector<Real> &Value,
+              const MachEnv *InEnv = MachEnv::getDefault(),
+              const int RankBcast  = -1);
+void Broadcast(std::vector<Real> &Value, const int RankBcast);
+
 void Broadcast(std::vector<bool> &Value,
                const MachEnv *InEnv = MachEnv::getDefault(),
                const int RankBcast  = -1);

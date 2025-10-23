@@ -92,6 +92,25 @@ void Broadcast(R8 &Value, const int RankBcast) {
 } // end Broadcast
 
 //------------------------------------------------------------------------------
+// Broadcast CoDiPack scalar Value
+void Broadcast(Real &Value, const MachEnv *InEnv, const int RankBcast) {
+   int RetVal, Root;
+
+   if (InEnv->isMember()) {
+      Root   = (RankBcast < 0) ? InEnv->getMasterTask() : RankBcast;
+      RetVal = MPI_Bcast(&Value, 1, MPI_DOUBLE, Root, InEnv->getComm());
+      if (RetVal != MPI_SUCCESS)
+        ABORT_ERROR("Broadcast R8: Error in MPI Broadcast");
+   }
+
+   return;
+} // end Broadcast
+
+void Broadcast(Real &Value, const int RankBcast) {
+   Broadcast(Value, MachEnv::getDefault(), RankBcast);
+} // end Broadcast
+
+//------------------------------------------------------------------------------
 // Broadcast bool scalar Value
 void Broadcast(bool &Value, const MachEnv *InEnv, const int RankBcast) {
    int RetVal, Root;
@@ -225,6 +244,27 @@ void Broadcast(std::vector<R8> &Value, const MachEnv *InEnv,
 void Broadcast(std::vector<R8> &Value, const int RankBcast) {
    Broadcast(Value, MachEnv::getDefault(), RankBcast);
 }
+
+
+//------------------------------------------------------------------------------
+// Broadcast CoDiPack array
+void Broadcast(std::vector<Real> &Value, const MachEnv *InEnv, const int RankBcast) {
+   int RetVal, Root;
+
+   if (InEnv->isMember()) {
+      Root   = (RankBcast < 0) ? InEnv->getMasterTask() : RankBcast;
+      RetVal = MPI_Bcast((void *)Value.data(), Value.size(), MPI_DOUBLE, Root,
+                         InEnv->getComm());
+      if (RetVal != MPI_SUCCESS)
+         ABORT_ERROR("Broadcast R8 vector: Error in MPI Broadcast");
+   }
+
+   return;
+} // end Broadcast
+
+void Broadcast(std::vector<Real> &Value, const int RankBcast) {
+   Broadcast(Value, MachEnv::getDefault(), RankBcast);
+} // end Broadcast
 
 //------------------------------------------------------------------------------
 // Broadcast bool array
