@@ -13,6 +13,15 @@ namespace OMEGA {
 // check if two real numbers are equal with a given relative tolerance
 KOKKOS_INLINE_FUNCTION
 bool isApprox(Real X, Real Y, Real RTol, Real ATol = 0) {
+#ifdef USE_CODIPACK
+   if (codi::isnan(X) || codi::isnan(Y) || codi::isinf(X) ||
+       codi::isinf(Y)) {
+      return false; // Treat NaN or Inf as failure
+   }
+
+   return codi::abs(X - Y) <=
+          codi::max(ATol, RTol * codi::max(codi::abs(X), codi::abs(Y)));
+#else
    if (Kokkos::isnan(X) || Kokkos::isnan(Y) || Kokkos::isinf(X) ||
        Kokkos::isinf(Y)) {
       return false; // Treat NaN or Inf as failure
@@ -20,6 +29,7 @@ bool isApprox(Real X, Real Y, Real RTol, Real ATol = 0) {
 
    return Kokkos::abs(X - Y) <=
           Kokkos::max(ATol, RTol * Kokkos::max(Kokkos::abs(X), Kokkos::abs(Y)));
+#endif
 }
 
 // convert spherical components of a vector to Cartesian
@@ -39,7 +49,11 @@ KOKKOS_INLINE_FUNCTION void tangentVector(Real (&TanVec)[3],
                                           const Real (&X1)[3],
                                           const Real (&X2)[3], Real t = 0) {
    const Real Radius =
+#ifdef USE_CODIPACK
+       codi::sqrt(X1[0] * X1[0] + X1[1] * X1[1] + X1[2] * X1[2]);
+#else
        Kokkos::sqrt(X1[0] * X1[0] + X1[1] * X1[1] + X1[2] * X1[2]);
+#endif
    Real XC[3];
    Real DX[3];
    for (int Dim = 0; Dim < 3; ++Dim) {
@@ -48,7 +62,11 @@ KOKKOS_INLINE_FUNCTION void tangentVector(Real (&TanVec)[3],
    }
    const Real XCDotDX = XC[0] * DX[0] + XC[1] * DX[1] + XC[2] * DX[2];
    const Real NormXC =
+#ifdef USE_CODIPACK
+       codi::sqrt(XC[0] * XC[0] + XC[1] * XC[1] + XC[2] * XC[2]);
+#else
        Kokkos::sqrt(XC[0] * XC[0] + XC[1] * XC[1] + XC[2] * XC[2]);
+#endif
 
    for (int Dim = 0; Dim < 3; ++Dim) {
       const Real NormXC3 = NormXC * NormXC * NormXC;
@@ -56,7 +74,11 @@ KOKKOS_INLINE_FUNCTION void tangentVector(Real (&TanVec)[3],
           Radius / NormXC * DX[Dim] - (Radius * XCDotDX) / NormXC3 * XC[Dim];
    }
 
+#ifdef USE_CODIPACK
+   const Real NormTanVec = codi::sqrt(
+#else
    const Real NormTanVec = Kokkos::sqrt(
+#endif
        TanVec[0] * TanVec[0] + TanVec[1] * TanVec[1] + TanVec[2] * TanVec[2]);
    for (int Dim = 0; Dim < 3; ++Dim) {
       TanVec[Dim] /= NormTanVec;
@@ -303,12 +325,21 @@ int setVectorEdge(const Functor &Fun, const Array &VectorFieldEdge,
 inline Real maxVal(const Array1DReal &Arr) {
    Real MaxVal;
 
+#ifdef USE_CODIPACK
+   parallelReduce(
+       {Arr.extent_int(0)},
+       KOKKOS_LAMBDA(int I, Real &Accum) {
+          Accum = codi::max(Arr(I), Accum);
+       },
+       Kokkos::Max<Real>(MaxVal));
+#else
    parallelReduce(
        {Arr.extent_int(0)},
        KOKKOS_LAMBDA(int I, Real &Accum) {
           Accum = Kokkos::max(Arr(I), Accum);
        },
        Kokkos::Max<Real>(MaxVal));
+#endif
 
    return MaxVal;
 }
@@ -569,12 +600,20 @@ inline int checkErrors(const std::string &TestSuite,
    if (!isApprox(Errors.LInf, ExpectedErrors.LInf, RTol, ATol)) {
       Err++;
       LOG_ERROR("{}: {} LInf FAIL, expected {}, got {}", TestSuite, Variable,
+#ifdef USE_CODIPACK
+                ExpectedErrors.LInf.getValue(), Errors.LInf.getValue());
+#else
                 ExpectedErrors.LInf, Errors.LInf);
+#endif
    }
    if (!isApprox(Errors.L2, ExpectedErrors.L2, RTol, ATol)) {
       Err++;
       LOG_ERROR("{}: {} L2 FAIL, expected {}, got {}", TestSuite, Variable,
+#ifdef USE_CODIPACK
+                ExpectedErrors.L2.getValue(), Errors.L2.getValue());
+#else
                 ExpectedErrors.L2, Errors.L2);
+#endif
    }
    return Err;
 }
