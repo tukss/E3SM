@@ -77,27 +77,39 @@ void initHorzMeshTest() {
 
 //------------------------------------------------------------------------------
 // Computes the distance of a x,y,z coordinate from the origin
+#ifdef USE_CODIPACK
+Real distance(Real X, Real Y, Real Z) {
+#else
 R8 distance(R8 X, R8 Y, R8 Z) {
-
-   R8 Dist = sqrt(X * X + Y * Y + Z * Z);
-   return Dist;
+  return sqrt(X * X + Y * Y + Z * Z);
 }
 
 //------------------------------------------------------------------------------
 // Computes the distance between two lon/lat points on the sphere
-R8 sphereDistance(R8 Lon1, R8 Lat1, R8 Lon2, R8 Lat2) {
-
-   R8 Arg = sqrt(pow(sin(0.5 * (Lat1 - Lat2)), 2) +
+#ifdef USE_CODIPACK
+Real sphereDistance(Real Lon1, Real Lat1, Real Lon2, Real Lat2) {
+   Real
+#else
+R8 sphereDistance(R8 lon1, R8 lat1, R8 lon2, R8 lat2) {
+  R8
+#endif
+    Arg = sqrt(pow(sin(0.5 * (Lat1 - Lat2)), 2) +
                  cos(Lat2) * cos(Lat1) * pow(sin(0.5 * (Lon1 - Lon2)), 2));
-   return 2.0 * asin(Arg);
+  return 2.0 * asin(Arg);
 }
 
 //------------------------------------------------------------------------------
 // Computes the longitude of a point given its Cartesian coordinates
+#ifdef USE_CODIPACK
+Real computeLon(Real X, Real Y, Real Z) {
+   Real
+#else
 R8 computeLon(R8 X, R8 Y, R8 Z) {
+   R8
+#endif
 
-   R8 Lon = atan2(Y, X);
-   R8 Pi  = 4.0 * atan(1.0);
+     Lon = atan2(Y, X);
+   decltype(Lon) Pi  = 4.0 * atan(1.0);
    if (Lon < 0.0) {
       Lon = 2.0 * Pi + Lon;
    }
@@ -106,20 +118,28 @@ R8 computeLon(R8 X, R8 Y, R8 Z) {
 
 //------------------------------------------------------------------------------
 // Computes the latitude of a point given its Cartesian coordinates
+#ifdef USE_CODIPACK
+Real computeLat(Real x, Real y, Real z) {
+   Real
+#else
 R8 computeLat(R8 X, R8 Y, R8 Z) {
-
-   R8 Dist = distance(X, Y, Z);
-   R8 Lat  = asin(Z / Dist);
+   R8
+#endif
+     Dist = distance(X, Y, Z);
+   decltype(Dist) Lat  = asin(Z / Dist);
 
    return Lat;
 }
 
 //------------------------------------------------------------------------------
 // Computes coriolis parameter for a given latitude
+#ifdef USE_CODIPACK
+Real coriolis(Real Lat) {
+#else
 R8 coriolis(R8 Lat) {
 
    R8 Omega = 7.29212e-5;
-   R8 F     = 2.0 * Omega * sin(Lat);
+   decltype(coriolis(0.0)) F = 2.0 * Omega * sin(Lat);
 
    return F;
 }
@@ -178,9 +198,14 @@ int main(int argc, char *argv[]) {
       // Check that all cell centers are a uniform distance from the origin
       // Tests that the Cartesian coordinates for cell centers have been read in
       // corectly
-      R8 SphereRadius =
+#ifdef USE_CODIPACK
+      Real
+#else
+      R8
+#endif
+          SphereRadius =
           distance(Mesh->XCellH(0), Mesh->YCellH(0), Mesh->ZCellH(0));
-      R8 Dist;
+      decltype(SphereRadius) Dist;
       I4 Count = 0;
       for (int Cell = 0; Cell < LocCells; Cell++) {
          Dist = distance(Mesh->XCellH(Cell), Mesh->YCellH(Cell),
@@ -198,7 +223,7 @@ int main(int argc, char *argv[]) {
       // the metadata disagrees with REarth, so this mostly confirms that the
       // coordinates were generated on that same sphere. Coordinates are
       // stored as Real, so the tolerance depends on the build precision.
-      R8 RadiusRelTol = sizeof(Real) == 4 ? 1.e-6 : 1.e-10;
+      R8 RadiusRelTol = sizeof(PassiveReal) == 4 ? 1.e-6 : 1.e-10;
       if (!Mesh->OnSphere)
          ABORT_ERROR("HorzMeshTest: OnSphere flag test FAIL");
       if (abs((Mesh->SphereRadius - SphereRadius) / SphereRadius) >
@@ -215,8 +240,7 @@ int main(int argc, char *argv[]) {
       // values that have been read in
       // Tests that the lon/lat coordinates for cell
       // centers have been read in correctly
-      R8 Lon;
-      R8 Lat;
+      decltype(SphereRadius) Lon, Lat;
       Count = 0;
       for (int Cell = 0; Cell < LocCells; Cell++) {
 
@@ -346,8 +370,13 @@ int main(int argc, char *argv[]) {
       // Find the global sum of all the local cell areas
       // and compares to reasonable value for Earth's ocean area
       // Tests that cell areas have been read in correctly
+#ifdef USE_CODIPACK
+      Real LocSumArea = 0;
+      Real SumCellArea;
+#else
       R8 LocSumArea = 0;
       R8 SumCellArea;
+#endif
       for (int Cell = 0; Cell < LocCells; Cell++) {
          LocSumArea += Mesh->AreaCellH(Cell);
       }
@@ -356,6 +385,9 @@ int main(int argc, char *argv[]) {
       if (Err != MPI_SUCCESS)
          ABORT_ERROR("HorzMeshTest: MPI error summing cell area");
 
+#ifdef USE_CODIPACK
+      Real OceanArea = 3.61e14;
+#else
       R8 OceanArea = 3.61e14;
       if (abs(SumCellArea - OceanArea) / OceanArea > 0.05)
          ABORT_ERROR("HorzMeshTest: Cell area test FAIL");
@@ -365,7 +397,11 @@ int main(int argc, char *argv[]) {
       // and compare to resonable value for the Earth's ocean area
       // Tests that the triangle areas have been read in correctly
       LocSumArea = 0;
+#ifdef USE_CODIPACK
+      Real SumTriangleArea;
+#else
       R8 SumTriangleArea;
+#endif
       for (int Vertex = 0; Vertex < LocVertices; Vertex++) {
          LocSumArea += Mesh->AreaTriangleH(Vertex);
       }
@@ -382,7 +418,11 @@ int main(int argc, char *argv[]) {
       // and compare to reasonable value for the Earth's ocean area
       // Tests that the kite areas have been read in correctly
       LocSumArea = 0;
+#ifdef USE_CODIPACK
+      Real SumKiteArea;
+#else
       R8 SumKiteArea;
+#endif
       for (int Vertex = 0; Vertex < LocVertices; Vertex++) {
          for (int i = 0; i < Mesh->VertexDegree; i++) {
             LocSumArea += Mesh->KiteAreasOnVertexH(Vertex, i);
@@ -407,7 +447,7 @@ int main(int argc, char *argv[]) {
 
          if ((Cell1 < DefDecomp->NCellsAll) && (Cell2 < DefDecomp->NCellsAll)) {
 
-            R8 Dc =
+            decltype(SphereRadius) Dc =
                 sphereDistance(Mesh->LonCellH(Cell1), Mesh->LatCellH(Cell1),
                                Mesh->LonCellH(Cell2), Mesh->LatCellH(Cell2));
             Dc = SphereRadius * Dc;
@@ -433,7 +473,7 @@ int main(int argc, char *argv[]) {
          if ((Vertex1 < DefDecomp->NVerticesAll) &&
              (Vertex2 < DefDecomp->NVerticesAll)) {
 
-            R8 Dv = sphereDistance(
+            decltype(SphereRadius) Dv = sphereDistance(
                 Mesh->LonVertexH(Vertex1), Mesh->LatVertexH(Vertex1),
                 Mesh->LonVertexH(Vertex2), Mesh->LatVertexH(Vertex2));
 
@@ -467,7 +507,7 @@ int main(int argc, char *argv[]) {
       // Tests that the cell Coriolis values were read in correctly
       Count = 0;
       for (int Cell = 0; Cell < LocCells; Cell++) {
-         R8 F = coriolis(Mesh->LatCellH(Cell));
+         decltype(SphereRadius) F = coriolis(Mesh->LatCellH(Cell));
 
          if (abs(F - Mesh->FCellH(Cell)) > Tol) {
             Count++;
@@ -484,7 +524,7 @@ int main(int argc, char *argv[]) {
       Count = 0;
       for (int Vertex = 0; Vertex < LocVertices; Vertex++) {
 
-         R8 F = coriolis(Mesh->LatVertexH(Vertex));
+         decltype(SphereRadius) F = coriolis(Mesh->LatVertexH(Vertex));
 
          if (abs(F - Mesh->FVertexH(Vertex)) > Tol) {
             Count++;
@@ -500,7 +540,7 @@ int main(int argc, char *argv[]) {
       // Tests that the edge Coriolis values were read in correctly
       Count = 0;
       for (int Edge = 0; Edge < LocEdges; Edge++) {
-         R8 F = coriolis(Mesh->LatEdgeH(Edge));
+         decltype(SphereRadius) F = coriolis(Mesh->LatEdgeH(Edge));
 
          if (abs(F - Mesh->FEdgeH(Edge)) > Tol) {
             Count++;
@@ -598,6 +638,9 @@ int main(int argc, char *argv[]) {
       // read values
       // Tests that halo values are read in correctly
       Halo *DefHalo = Halo::getDefault();
+#ifdef USE_CODIPACK
+      HostArray1DReal XCellTest("XCellTest", Mesh->NCellsSize);
+#else
       HostArray1DR8 XCellTest("XCellTest", Mesh->NCellsSize);
       deepCopy(XCellTest, Mesh->XCellH);
 
@@ -621,6 +664,9 @@ int main(int argc, char *argv[]) {
       // Perform halo exhange on owned edge only array and compare
       // read values
       // Tests that halo values are read in correctly
+#ifdef USE_CODIPACK
+      HostArray1DReal XEdgeTest("XEdgeTest", Mesh->NEdgesSize);
+#else
       HostArray1DR8 XEdgeTest("XEdgeTest", Mesh->NEdgesSize);
       deepCopy(XEdgeTest, Mesh->XEdgeH);
 
@@ -644,6 +690,9 @@ int main(int argc, char *argv[]) {
       // Perform halo exhange on owned vertex only array and compare
       // read values
       // Tests that halo values are read in correctly
+#ifdef USE_CODIPACK
+      HostArray1DReal XVertexTest("XVertexTest", Mesh->NVerticesSize);
+#else
       HostArray1DR8 XVertexTest("XVertexTest", Mesh->NVerticesSize);
       deepCopy(XVertexTest, Mesh->XVertexH);
 
