@@ -133,5 +133,15 @@ inline constexpr bool isKokkosArray = Kokkos::is_view<T>::value;
 
 } // end namespace OMEGA
 
+#ifdef USE_CODIPACK
+// This specialization is needed to support Kokkos reductions on CoDiPACK types.
+template<>
+struct Kokkos::reduction_identity<decltype(OMEGA::Real(1))> {
+  static KOKKOS_INLINE_FUNCTION auto max() {
+    return Kokkos::reduction_identity<OMEGA::PassiveReal>::max();
+  }
+};
+#endif
+
 //===----------------------------------------------------------------------===//
 #endif
