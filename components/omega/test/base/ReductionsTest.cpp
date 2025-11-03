@@ -20,6 +20,8 @@
 #include "Pacer.h"
 #include "Reductions.h"
 
+MpiTypes* mpiTypes;
+
 using namespace OMEGA;
 
 //------------------------------------------------------------------------------

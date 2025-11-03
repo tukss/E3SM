@@ -30,6 +30,7 @@
 #include <iostream>
  
 using namespace medi;
+using MpiTypes = codi::CoDiMpiTypes<codi::RealReverse>;
 
 #endif
 

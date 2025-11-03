@@ -36,6 +36,8 @@ using std::complex;
 #include "Error.h"
 #include "OmegaKokkos.h"
 
+extern MpiTypes* mpiTypes;
+
 namespace OMEGA {
 
 inline bool R8SumNotInitialized = true;
