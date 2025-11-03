@@ -352,7 +352,12 @@ int testTimeStepper(const std::string &Name, TimeStepperType Type,
    std::vector<Real> ConvRates(NRefinements - 1);
    for (int RefLevel = 0; RefLevel < NRefinements - 1; ++RefLevel) {
       ConvRates[RefLevel] =
-          std::log2(Errors[RefLevel].LInf / Errors[RefLevel + 1].LInf);
+#ifdef USE_CODIPACK
+          codi::log2
+#else
+          std::log2
+#endif
+          (Errors[RefLevel].LInf / Errors[RefLevel + 1].LInf);
    }
 
    if (std::abs(ConvRates.back() - ExpectedOrder) > ATol) {
