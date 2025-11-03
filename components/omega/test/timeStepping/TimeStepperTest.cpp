@@ -247,7 +247,7 @@ int initTimeStepperTest(const std::string &mesh) {
 
 // Slightly adjust time step so that it evenly divides TimeEnd and return number
 // of steps
-int adjustTimeStep(TimeStepper *Stepper, Real TimeEnd) {
+int adjustTimeStep(TimeStepper *Stepper, PassiveReal TimeEnd) {
    TimeInterval TimeStep = Stepper->getTimeStep();
    R8 TimeStepSeconds;
    TimeStep.get(TimeStepSeconds, TimeUnits::Seconds);
@@ -261,7 +261,7 @@ int adjustTimeStep(TimeStepper *Stepper, Real TimeEnd) {
    return NSteps;
 }
 
-void timeLoop(TimeInstant TimeStart, Real TimeEnd) {
+void timeLoop(TimeInstant TimeStart, PassiveReal TimeEnd) {
    auto *Stepper = TimeStepper::get("TestTimeStepper");
    auto *State   = OceanState::get("TestState");
 
@@ -292,7 +292,7 @@ void finalizeTimeStepperTest() {
 }
 
 int testTimeStepper(const std::string &Name, TimeStepperType Type,
-                    Real ExpectedOrder, Real ATol) {
+                    PassiveReal ExpectedOrder, PassiveReal ATol) {
    int Err = 0;
 
    // Set pointers to data
@@ -304,10 +304,10 @@ int testTimeStepper(const std::string &Name, TimeStepperType Type,
    // Set time information
    const TimeInstant TimeStart(0, 0, 0, 0, 0, 0);
 
-   const Real TimeEnd = 1;
+   const PassiveReal TimeEnd = 1;
    TimeInstant TimeEndTI(0, 0, 0, 0, 0, 1);
 
-   const Real BaseTimeStepSeconds = 0.2;
+   const PassiveReal BaseTimeStepSeconds = 0.2;
    TimeInterval TimeStepTI(BaseTimeStepSeconds, TimeUnits::Seconds);
 
    auto *TestTimeStepper = TimeStepper::create(
@@ -380,17 +380,17 @@ int timeStepperTest(const std::string &MeshFile = "OmegaMesh.nc") {
    Real ExpectedOrder = 4;
    Real ATol          = 0.1;
    Err += testTimeStepper("RungeKutta4", TimeStepperType::RungeKutta4,
-                          ExpectedOrder, ATol);
+                          ExpectedOrder.getValue(), ATol.getValue());
 
    ExpectedOrder = 1;
    ATol          = 0.1;
    Err += testTimeStepper("ForwardBackward", TimeStepperType::ForwardBackward,
-                          ExpectedOrder, ATol);
+                          ExpectedOrder.getValue(), ATol.getValue());
 
    ExpectedOrder = 2;
    ATol          = 0.1;
    Err += testTimeStepper("RungeKutta2", TimeStepperType::RungeKutta2,
-                          ExpectedOrder, ATol);
+                          ExpectedOrder.getValue(), ATol.getValue());
 
    if (Err == 0) {
       LOG_INFO("TimeStepperTest: Successful completion");
