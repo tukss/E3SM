@@ -84,7 +84,7 @@ int testDiffusionCorrectness(int NBatch, int NRow) {
    Array2DReal AX("AX", NBatch, NRow);
    parallelFor(
        {NBatch, NRow}, KOKKOS_LAMBDA(int I, int K) {
-          const Real DL = K == 0 ? 0 : -G(I, K - 1);
+          const Real DL = K == 0 ? Real(0) : -G(I, K - 1);
           const Real DU = -G(I, K);
           const Real D  = H(I, K) - DL - DU;
 
