@@ -250,7 +250,12 @@ int main(int argc, char *argv[]) {
       int Count2 = 0;
       for (int Cell = 0; Cell < NCellsAll; Cell++) {
          for (int Layer = 0; Layer < NVertLayers; Layer++) {
-            R8 val = LayerThickHDef(Cell, Layer);
+#ifdef USE_CODIPACK
+            Real
+#else
+            R8
+#endif
+              val = LayerThickHDef(Cell, Layer);
             if (val != 0.0)
                ++Count1;                     // check for all-zero array
             if (val < 0.0 and val > 300.0) { // out of range
