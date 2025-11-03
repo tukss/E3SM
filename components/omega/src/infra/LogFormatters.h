@@ -13,6 +13,18 @@
 #include <spdlog/spdlog.h>
 
 #ifdef OMEGA_DEBUG
+
+#ifdef USE_CODIPACK
+template <class charT>
+struct fmt::formatter<OMEGA::Real, charT> : fmt::formatter<OMEGA::PassiveReal, charT> {
+  template <class FormatContext>
+    auto format(const OMEGA::Real & t, FormatContext& ctx) const {
+      // Delegate to the double formatter with your chosen representation
+      return fmt::formatter<OMEGA::PassiveReal, charT>::format(t.getValue(), ctx);
+    }
+};
+#endif
+
 #define GENERATE_FORMATTER(ARR, DIM, TYPE)                                     \
    template <>                                                                 \
    struct fmt::formatter<OMEGA::ARR##DIM##TYPE>                                \
