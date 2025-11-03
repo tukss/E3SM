@@ -67,14 +67,7 @@ if(MeDiPack_FOUND)
       INTERFACE
       USE_MEDIPACK=1
   )
-  #add_library(MeDiPack INTERFACE )
-  #target_include_directories(MeDiPack INTERFACE "$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>"
-  #                                                      "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")
-  #target_include_directories(MeDiPack INTERFACE "${CMAKE_CURRENT_SOURCE_DIR}/include") 
-  include_directories(MeDiPack PUBLIC "/pscratch/sd/s/snarayan/MeDiPack/include/")  
-  target_include_directories(MeDiPack INTERFACE "/pscratch/sd/s/snarayan/MeDiPack/include/")                                                    
-  #target_link_libraries(OmegaLibFlags PRIVATE MeDiPack)
-  ##target_link_libraries(OmegaLibFlags PRIVATE MeDiPack)
+  target_link_libraries(OmegaLibFlags INTERFACE MeDiPack)
 endif()
 
 target_link_options(
