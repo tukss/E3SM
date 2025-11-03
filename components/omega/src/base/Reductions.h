@@ -14,6 +14,8 @@ using std::complex;
 #include "DataTypes.h"
 #include "OmegaKokkos.h"
 
+extern MpiTypes* mpiTypes;
+
 namespace OMEGA {
 
 static int R8SumInitialized = 0;
@@ -82,6 +84,17 @@ int globalSum(const R8 *Val, const MPI_Comm Comm, R8 *Res) {
    *Res     = real(GlobalTmp);
    return ierr;
 }
+
+#ifdef USE_CODIPACK
+int globalSum(const Real *Val, const AMPI_Comm Comm, Real *Res) {
+   Real LocalTmp, GlobalTmp;
+   LocalTmp = *Val;
+   int ierr =
+       AMPI_Allreduce(&LocalTmp, &GlobalTmp, 1, mpiTypes->MPI_TYPE, AMPI_SUM, Comm);
+   *Res = GlobalTmp;
+   return ierr;
+}
+#endif
 
 //////////
 // Global sum arrays
