@@ -642,7 +642,7 @@ int main(int argc, char *argv[]) {
       count = 0;
       for (int Vertex = 0; Vertex < LocVertices; Vertex++) {
 
-#ifdef ALLOW_CODIPACK
+#ifdef USE_CODIPACK
          Real f = coriolis(Mesh->LatVertexH(Vertex));
 #else
          R8 f = coriolis(Mesh->LatVertexH(Vertex));
@@ -666,7 +666,7 @@ int main(int argc, char *argv[]) {
       // Tests that the edge Coriolis values were read in correctly
       count = 0;
       for (int Edge = 0; Edge < LocEdges; Edge++) {
-#ifdef ALLOW_CODIPACK
+#ifdef USE_CODIPACK
          Real f = coriolis(Mesh->LatEdgeH(Edge));
 #else
          R8 f = coriolis(Mesh->LatEdgeH(Edge));
