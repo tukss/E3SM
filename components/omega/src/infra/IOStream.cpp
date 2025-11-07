@@ -2654,6 +2654,7 @@ int IOStream::writeStream(
       if (ThisField->isTimeDependent()) {
          ++NDims;
          DimNames.insert(DimNames.begin(), "time");
+         FieldDims.resize(NDims);
       }
       // Get the dim IDs
       for (int IDim = 0; IDim < NDims; ++IDim) {
