@@ -529,7 +529,12 @@ Error Field::getMetadata(
    Error Err; // returned error code, default success
 
    if (hasMetadata(MetaName)) {
-      Value = std::any_cast<R8>(FieldMeta[MetaName]);
+       if (FieldMeta[MetaName].type() == typeid(R8))
+          Value = std::any_cast<R8>(FieldMeta[MetaName]);
+#ifdef USE_CODIPACK
+       else if (FieldMeta[MetaName].type() == typeid(Real))
+         Value = std::any_cast<Real>(FieldMeta[MetaName]).getValue();
+#endif
    } else {
       RETURN_ERROR(Err, ErrorCode::Fail,
                    "Metadata {} does not exist for field {}.", MetaName,
