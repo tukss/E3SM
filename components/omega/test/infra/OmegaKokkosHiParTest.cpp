@@ -281,7 +281,7 @@ Error testHiparFor1DMultiple1D(int N1, int N2) {
          RefBH(J1, J2) = (RefAH(J1, J2) + RefAH(J1, J2 + 1)) / 2;
       }
 
-      Real ScanAccum = 0;
+      PassiveReal ScanAccum = 0;
       for (int J2 = 0; J2 < N2; ++J2) {
          ScanAccum += RefBH(J1, J2);
          RefCH(J1, J2) = ScanAccum;
@@ -293,7 +293,7 @@ Error testHiparFor1DMultiple1D(int N1, int N2) {
          }
       }
 
-      Real SumAccum = 0;
+      PassiveReal SumAccum = 0;
       for (int J2 = 0; J2 < N2; ++J2) {
          SumAccum += RefCH(J1, J2);
       }
@@ -597,7 +597,7 @@ Error testHiparFor2DMultiple1D(int N1, int N2, int N3) {
             RefBH(J1, J2, J3) = (RefAH(J1, J2, J3) + RefAH(J1, J2, J3 + 1)) / 2;
          }
 
-         Real ScanAccum = 0;
+         PassiveReal ScanAccum = 0;
          for (int J3 = 0; J3 < N3; ++J3) {
             ScanAccum += RefBH(J1, J2, J3);
             RefCH(J1, J2, J3) = ScanAccum;
@@ -609,7 +609,7 @@ Error testHiparFor2DMultiple1D(int N1, int N2, int N3) {
             }
          }
 
-         Real SumAccum = 0;
+         PassiveReal SumAccum = 0;
          for (int J3 = 0; J3 < N3; ++J3) {
             SumAccum += RefCH(J1, J2, J3);
          }
