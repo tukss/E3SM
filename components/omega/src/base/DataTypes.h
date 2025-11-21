@@ -141,6 +141,9 @@ struct Kokkos::reduction_identity<decltype(OMEGA::Real(1))> {
   static KOKKOS_INLINE_FUNCTION auto max() {
     return Kokkos::reduction_identity<OMEGA::PassiveReal>::max();
   }
+  static KOKKOS_INLINE_FUNCTION auto sum() {
+    return Kokkos::reduction_identity<OMEGA::PassiveReal>::sum();
+  }
 };
 
 namespace Kokkos {
