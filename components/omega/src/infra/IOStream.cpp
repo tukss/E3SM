@@ -847,6 +847,11 @@ void IOStream::writeFieldMeta(
       std::string MetaName = IMeta->first;
       // Get value after determining the data type
       std::any MetaVal = IMeta->second;
+#ifdef USE_CODIPACK
+      if (MetaVal.type() == typeid(Real)) {
+         MetaVal = std::any_cast<Real>(MetaVal).getValue();
+      }
+#endif
       if (MetaVal.type() == typeid(I8)) {
          I8 MetaValI8 = std::any_cast<I8>(MetaVal);
          IO::writeMeta(MetaName, MetaValI8, FileID, FieldID);
