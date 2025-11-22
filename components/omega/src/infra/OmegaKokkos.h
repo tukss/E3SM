@@ -47,6 +47,13 @@ template <class T> constexpr ArrayDataType checkArrayType() {
       return ArrayDataType::R8;
    }
 
+   if (std::is_same_v<typename T::non_const_value_type, Real>) {
+      if (std::is_same_v<PassiveReal, R8>)
+         return ArrayDataType::R8;
+      else if (std::is_same_v<PassiveReal, R4>)
+         return ArrayDataType::R4;
+   }
+
    return ArrayDataType::Unknown;
 }
 
