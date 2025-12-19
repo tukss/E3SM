@@ -166,6 +166,18 @@ template <typename T> using Array4D_t = typename Array4D<T>::type;
 template <typename T> using Array5D_t = typename Array5D<T>::type;
 
 template <typename V>
+auto createHostMirror(const V &View)
+    -> Kokkos::View<typename V::data_type, HostMemLayout, HostMemSpace> {
+   return Kokkos::create_mirror_view(HostExecSpace(), View);
+}
+
+template <typename V>
+auto createDeviceMirror(const V &View)
+    -> Kokkos::View<typename V::data_type, MemLayout, MemSpace> {
+   return Kokkos::create_mirror_view(ExecSpace(), View);
+}
+
+template <typename V>
 auto createHostMirrorCopy(const V &View)
     -> Kokkos::View<typename V::data_type, HostMemLayout, HostMemSpace> {
    return Kokkos::create_mirror_view_and_copy(HostExecSpace(), View);
