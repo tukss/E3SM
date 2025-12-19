@@ -175,6 +175,18 @@ template <class F, int Rank> struct LinearIdxWrapper : F {
 };
 
 template <typename V>
+auto createHostMirror(const V &View)
+    -> Kokkos::View<typename V::data_type, HostMemLayout, HostMemSpace> {
+   return Kokkos::create_mirror_view(HostExecSpace(), View);
+}
+
+template <typename V>
+auto createDeviceMirror(const V &View)
+    -> Kokkos::View<typename V::data_type, MemLayout, MemSpace> {
+   return Kokkos::create_mirror_view(ExecSpace(), View);
+}
+
+template <typename V>
 auto createHostMirrorCopy(const V &View)
     -> Kokkos::View<typename V::data_type, HostMemLayout, HostMemSpace> {
    return Kokkos::create_mirror_view_and_copy(HostExecSpace(), View);
