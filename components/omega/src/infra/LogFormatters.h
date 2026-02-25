@@ -12,38 +12,40 @@
 #include "DataTypes.h"
 #include <spdlog/spdlog.h>
 
-#ifdef OMEGA_DEBUG
-
 #ifdef USE_CODIPACK
 template <class charT>
-struct fmt::formatter<OMEGA::Real, charT> : fmt::formatter<OMEGA::PassiveReal, charT> {
-  template <class FormatContext>
-    auto format(const OMEGA::Real & t, FormatContext& ctx) const {
+struct fmt::formatter<OMEGA::Real, charT>
+    : fmt::formatter<OMEGA::PassiveReal, charT> {
+   template <class FormatContext>
+   auto format(const OMEGA::Real &t, FormatContext &ctx) const {
       // Delegate to the double formatter with your chosen representation
-      return fmt::formatter<OMEGA::PassiveReal, charT>::format(t.getValue(), ctx);
-    }
+      return fmt::formatter<OMEGA::PassiveReal, charT>::format(t.getValue(),
+                                                               ctx);
+   }
 };
 #endif
+
+#ifdef OMEGA_DEBUG
 
 #define GENERATE_FORMATTER(ARR, DIM, TYPE)                                     \
    template <>                                                                 \
    struct fmt::formatter<OMEGA::ARR##DIM##TYPE>                                \
        : fmt::formatter<std::string> {                                         \
-      auto format(OMEGA::ARR##DIM##TYPE my,                                    \
-                  format_context &ctx) -> decltype(ctx.out()) {                \
+      auto format(OMEGA::ARR##DIM##TYPE my, format_context &ctx)               \
+          -> decltype(ctx.out()) {                                             \
          return fmt::format_to(ctx.out(), "{}({}D:{})", my.label(), my.rank(), \
                                my.size());                                     \
       }                                                                        \
    };
 #else
-#define GENERATE_FORMATTER(ARR, DIM, TYPE)                      \
-   template <>                                                  \
-   struct fmt::formatter<OMEGA::ARR##DIM##TYPE>                 \
-       : fmt::formatter<std::string> {                          \
-      auto format(OMEGA::ARR##DIM##TYPE my,                     \
-                  format_context &ctx) -> decltype(ctx.out()) { \
-         return fmt::format_to(ctx.out(), "{}", my.label());    \
-      }                                                         \
+#define GENERATE_FORMATTER(ARR, DIM, TYPE)                       \
+   template <>                                                   \
+   struct fmt::formatter<OMEGA::ARR##DIM##TYPE>                  \
+       : fmt::formatter<std::string> {                           \
+      auto format(OMEGA::ARR##DIM##TYPE my, format_context &ctx) \
+          -> decltype(ctx.out()) {                               \
+         return fmt::format_to(ctx.out(), "{}", my.label());     \
+      }                                                          \
    };
 #endif
 
