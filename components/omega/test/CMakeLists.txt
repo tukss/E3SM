@@ -55,9 +55,14 @@ if(CoDiPack_FOUND)
   target_link_libraries(${exe_name} INTERFACE CoDiPack)
 endif()
 
-  include_directories(${exe_name} PUBLIC "/pscratch/sd/s/snarayan/MeDiPack/include/")  
-  target_include_directories(${exe_name} INTERFACE "/pscratch/sd/s/snarayan/MeDiPack/include/")  
-
+if(MeDiPack_FOUND)
+  target_compile_definitions(
+      OmegaLibFlags
+      INTERFACE
+      USE_MEDIPACK=1
+  )
+  target_link_libraries(${exe_name} INTERFACE MeDiPack)
+endif()
   set_target_properties(${exe_name} PROPERTIES LINKER_LANGUAGE CXX)
 
   # Add the test command
