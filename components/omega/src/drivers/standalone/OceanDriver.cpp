@@ -12,6 +12,7 @@
 #include "TimeStepper.h"
 #include <mpi.h>
 
+#include <cfenv>
 #include <iostream>
 
 int main(int argc, char **argv) {
