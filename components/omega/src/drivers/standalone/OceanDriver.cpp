@@ -20,6 +20,17 @@ int main(int argc, char **argv) {
    int ErrCurr;
    int ErrFinalize;
 
+#if defined(_GNU_SOURCE) && !defined(__APPLE__)
+   if(-1 == feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW)) {
+	   std::cerr << "error when trying to trap floating-point exceptions"
+		   << std::endl;
+   }
+#else
+   std::cerr << "no support for trapping floating-point exceptions"
+	   << std::endl;
+#endif
+
+
    MPI_Init(&argc, &argv); // initialize MPI
    Kokkos::initialize();   // initialize Kokkos
    Pacer::initialize(MPI_COMM_WORLD);
