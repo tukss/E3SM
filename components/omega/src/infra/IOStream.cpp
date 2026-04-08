@@ -1031,12 +1031,12 @@ field_handler_return<VectorType> handle_single_type(
 } // namespace
 
 template <class A, class B>
-typename std::remove_reference<A>::type getval(B v) {
+inline typename std::remove_reference<A>::type getval(B v) {
    return v;
 }
 
 #ifdef USE_CODIPACK
-template <class A> typename std::remove_reference<A>::type getval(Real v) {
+template <class A> inline typename std::remove_reference<A>::type getval(Real v) {
    return v.getValue();
 }
 #endif
