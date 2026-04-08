@@ -30,7 +30,7 @@
 #include <iostream>
  
 using namespace medi;
-using MpiTypes = codi::CoDiMpiTypes<codi::RealReverse>;
+using MpiTypes = codi::CoDiMpiTypes<codi::RealForward>;
 
 #endif
 
@@ -44,7 +44,7 @@ using R8 = double;       ///< alias for 64-bit (double prec) real
 
 /// generic real 64-bit (default) or 32-bit (if -DSINGLE_PRECISION used)
 #ifdef USE_CODIPACK
-using Real = codi::RealReverse;
+using Real = codi::RealForward;
 #ifdef OMEGA_SINGLE_PRECISION
 using PassiveReal = float;
 #else
