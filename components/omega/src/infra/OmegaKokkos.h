@@ -22,7 +22,7 @@ namespace OMEGA {
 /// An enum is used to provide a shorthand for determining the type of
 /// field. These correspond to the supported Omega data types (Real will be
 /// identical to R4 or R8 depending on settings)
-enum class ArrayDataType { Unknown, I4, I8, R4, R8 };
+enum class ArrayDataType { Unknown, I4, I8, R4, R8, Real };
 
 /// An enum is used to identify the location of the data - currently
 /// either the device (the default) or explicitly on the host. Both refers
@@ -48,10 +48,11 @@ template <class T> constexpr ArrayDataType checkArrayType() {
    }
 
    if (std::is_same_v<typename T::non_const_value_type, Real>) {
-      if (std::is_same_v<PassiveReal, R8>)
+      return ArrayDataType::Real;
+      /*if (std::is_same_v<PassiveReal, R8>)
          return ArrayDataType::R8;
       else if (std::is_same_v<PassiveReal, R4>)
-         return ArrayDataType::R4;
+         return ArrayDataType::R4;*/
    }
 
    return ArrayDataType::Unknown;

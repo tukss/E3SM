@@ -37,9 +37,11 @@ class VorticityAuxVars {
 
          for (int KVec = 0; KVec < VecLength; ++KVec) {
             const int K = KStart + KVec;
+	    auto a = KiteAreasOnVertex(IVertex, J);
+	    auto b = LayerThickCell(JCell, K);
             LayerThickVertex[KVec] += InvAreaTriangle *
-                                      KiteAreasOnVertex(IVertex, J) *
-                                      LayerThickCell(JCell, K);
+                                      a * b
+                                      ;
             RelVortVertexTmp[KVec] += InvAreaTriangle * DcEdge(JEdge) *
                                       EdgeSignOnVertex(IVertex, J) *
                                       NormalVelEdge(JEdge, K);

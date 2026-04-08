@@ -999,7 +999,7 @@ field_handler_return<VectorType> handle_single_type(
    r.Data.resize(LocSize);
 
    // get fill value
-   ViewType FillVal;
+   VectorType FillVal;
    r.Err += FieldPtr->getMetadata("FillValue", FillVal);
    r.FillVal = FillVal;
    CHECK_ERROR_ABORT(r.Err, "Error retrieving FillValue for Field {}",
@@ -1029,6 +1029,14 @@ field_handler_return<VectorType> handle_single_type(
 };
 
 } // namespace
+
+template <class A, class B>
+typename std::remove_reference<A>::type getval(B v) {
+   return v;
+}
+template <class A> typename std::remove_reference<A>::type getval(Real v) {
+   return v.getValue();
+}
 
 //------------------------------------------------------------------------------
 // Write a field's data array, performing any manipulations to reduce
@@ -1084,7 +1092,7 @@ void IOStream::writeFieldData(
    void *FillValPtr;
 
    auto copy_view_to_arr = [](auto &d, const auto v, int ind, auto &&...R) {
-      d[ind] = v(R...);
+      d[ind] = getval<decltype(d[ind])>(v(R...));
    };
 
    switch (MyType) {
@@ -1125,6 +1133,21 @@ void IOStream::writeFieldData(
                                       copy_view_to_arr);
          DataPtr    = std::get<field_handler_return<R8>>(ret).Data.data();
          FillValPtr = &std::get<field_handler_return<R8>>(ret).FillVal;
+      }
+      break; // end R8 type
+
+   // Real Fields
+   case ArrayDataType::Real:
+      if (ReducePrecision and !RetainPrecision) {
+         ret = handle_single_type<Real, R4>(LocSize, FieldPtr, FieldName, NDims,
+                                            true, copy_view_to_arr);
+         DataPtr    = std::get<field_handler_return<R4>>(ret).Data.data();
+         FillValPtr = &std::get<field_handler_return<R4>>(ret).FillVal;
+      } else {
+         ret = handle_single_type<Real, PassiveReal>(
+             LocSize, FieldPtr, FieldName, NDims, true, copy_view_to_arr);
+         DataPtr = std::get<field_handler_return<PassiveReal>>(ret).Data.data();
+         FillValPtr = &std::get<field_handler_return<PassiveReal>>(ret).FillVal;
       }
       break; // end R8 type
 
@@ -1265,6 +1288,14 @@ Error IOStream::readFieldData(
                                    copy_arr_to_view, callBefore)
                 .Err;
       break; // end R8 fields
+
+   // Real Fields
+   case ArrayDataType::Real:
+      Err = handle_single_type<Real, PassiveReal>(LocSize, FieldPtr, FieldName,
+                                                  NDims, false,
+                                                  copy_arr_to_view, callBefore)
+                .Err;
+      break; // end Real fields
 
    default:
       ABORT_ERROR("IOStream readFieldData "
@@ -1673,6 +1704,7 @@ IO::IODataType IOStream::getFieldIOType(
       ReturnType = IO::IOTypeR4;
       break;
    case ArrayDataType::R8:
+   case ArrayDataType::Real:
       if (ReducePrecision and !FieldPtr->retainPrecision()) {
          ReturnType = IO::IOTypeR4;
       } else {
