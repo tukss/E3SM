@@ -1034,9 +1034,12 @@ template <class A, class B>
 typename std::remove_reference<A>::type getval(B v) {
    return v;
 }
+
+#ifdef USE_CODIPACK
 template <class A> typename std::remove_reference<A>::type getval(Real v) {
    return v.getValue();
 }
+#endif
 
 //------------------------------------------------------------------------------
 // Write a field's data array, performing any manipulations to reduce
