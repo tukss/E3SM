@@ -32,6 +32,8 @@
 using namespace medi;
 using MpiTypes = codi::CoDiMpiTypes<codi::RealForward>;
 
+inline MpiTypes* mpiTypes;
+
 #endif
 
 namespace OMEGA {
