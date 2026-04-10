@@ -118,11 +118,11 @@ Halo::Neighbor::Neighbor(
    RecvLists[1] = ExchList(RecvEdge);
    RecvLists[2] = ExchList(RecvVrtx);
 
-   SendBuffer = Array1DR8("SendBuffer", 0);
-   RecvBuffer = Array1DR8("RecvBuffer", 0);
+   SendBuffer = Array1DReal("SendBuffer", 0);
+   RecvBuffer = Array1DReal("RecvBuffer", 0);
 
-   SendBufferH = HostArray1DR8("SendBufferH", 0);
-   RecvBufferH = HostArray1DR8("RecvBufferH", 0);
+   SendBufferH = HostArray1DReal("SendBufferH", 0);
+   RecvBufferH = HostArray1DReal("RecvBufferH", 0);
 
 } // end Neighbor constructor
 
@@ -280,7 +280,7 @@ Halo *Halo::get(const std::string Name // name of Halo to retrieve
 
 //------------------------------------------------------------------------------
 // Get communicator for a Halo object
-MPI_Comm Halo::getComm() const { return MyComm; }
+AMPI_Comm Halo::getComm() const { return MyComm; }
 
 //------------------------------------------------------------------------------
 // Sets Halo class members NeighborList, NNghbr, SendFlags, and RecvFlags during
@@ -683,7 +683,7 @@ int Halo::startReceives(const bool UseDevBuffer) {
          }
 
          IErr[INghbr] =
-             MPI_Irecv(DataPtr, BufferSize, MPI_DOUBLE, LocNeighbor.TaskID,
+             AMPI_Irecv(static_cast<Real*>(DataPtr), BufferSize, mpiTypes->MPI_TYPE, LocNeighbor.TaskID,
                        MPI_ANY_TAG, MyComm, &LocNeighbor.RReq);
          if (IErr[INghbr] != 0) {
             LOG_ERROR("MPI error {} on task {} receive from task {}",
@@ -743,7 +743,7 @@ int Halo::startSends(const bool UseDevBuffer) {
          }
 
          IErr[INghbr] =
-             MPI_Isend(DataPtr, BufferSize, MPI_DOUBLE, LocNeighbor.TaskID, 0,
+             AMPI_Isend(static_cast<Real*>(DataPtr), BufferSize, mpiTypes->MPI_TYPE, LocNeighbor.TaskID, 0,
                        MyComm, &LocNeighbor.SReq);
          if (IErr[INghbr] != 0) {
             LOG_ERROR("MPI error {} on task {} send to task {}", IErr[INghbr],

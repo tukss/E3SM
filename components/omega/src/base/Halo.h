@@ -154,10 +154,10 @@ class Halo {
       /// index space. 0 = OnCell, 1 = OnEdge, 2 = OnVertex
       ExchList SendLists[3], RecvLists[3];
       /// Buffers for MPI communication on host and device
-      HostArray1DR8 SendBufferH, RecvBufferH;
-      Array1DR8 SendBuffer, RecvBuffer;
+      HostArray1DReal SendBufferH, RecvBufferH;
+      Array1DReal SendBuffer, RecvBuffer;
       /// MPI request handles for non-blocking MPI communication
-      MPI_Request RReq, SReq;
+      AMPI_Request RReq, SReq;
 
       // Flags to track whether a message has been received and whether
       // the buffer has been unpacked yet. The MPI_Test routine requires an
@@ -304,7 +304,7 @@ class Halo {
          parallelFor(
              {LocList.NTot}, KOKKOS_LAMBDA(int IExch) {
                 const ValType Val = Array(LocIndex(IExch));
-                R8 RVal;
+                Real RVal;
                 memcpy(&RVal, &Val, sizeof(ValType));
                 LocBuff(IExch) = RVal;
              });
@@ -314,7 +314,7 @@ class Halo {
          OMEGA_SCOPE(LocBuffH, Neighbors[CurNeighbor].SendBufferH);
          for (int IExch = 0; IExch < LocList.NTot; ++IExch) {
             const ValType Val = Array(LocIndexH(IExch));
-            R8 RVal;
+            Real RVal;
             memcpy(&RVal, &Val, sizeof(ValType));
             LocBuffH(IExch) = RVal;
          }
@@ -344,7 +344,7 @@ class Halo {
          parallelFor(
              {LocList.NTot, NJ}, KOKKOS_LAMBDA(int IExch, int J) {
                 const ValType Val = Array(LocIndex(IExch), J);
-                R8 RVal;
+                Real RVal;
                 memcpy(&RVal, &Val, sizeof(ValType));
                 const I4 IBuff = IExch * NJ + J;
                 LocBuff(IBuff) = RVal;
@@ -357,7 +357,7 @@ class Halo {
             for (int J = 0; J < NJ; ++J) {
                const I4 IBuff    = IExch * NJ + J;
                const ValType Val = Array(LocIndexH(IExch), J);
-               R8 RVal;
+               Real RVal;
                memcpy(&RVal, &Val, sizeof(ValType));
                LocBuffH(IBuff) = RVal;
             }
@@ -390,7 +390,7 @@ class Halo {
          parallelFor(
              {NK, NTotList, NJ}, KOKKOS_LAMBDA(int K, int IExch, int J) {
                 const ValType Val = Array(K, LocIndex(IExch), J);
-                R8 RVal;
+                Real RVal;
                 memcpy(&RVal, &Val, sizeof(ValType));
                 const I4 IBuff = (K * NTotList + IExch) * NJ + J;
                 LocBuff(IBuff) = RVal;
@@ -404,7 +404,7 @@ class Halo {
                for (int J = 0; J < NJ; ++J) {
                   const I4 IBuff    = (K * LocList.NTot + IExch) * NJ + J;
                   const ValType Val = Array(K, LocIndexH(IExch), J);
-                  R8 RVal;
+                  Real RVal;
                   memcpy(&RVal, &Val, sizeof(ValType));
                   LocBuffH(IBuff) = RVal;
                }
@@ -440,7 +440,7 @@ class Halo {
              {NL, NK, NTotList, NJ},
              KOKKOS_LAMBDA(int L, int K, int IExch, int J) {
                 const ValType Val = Array(L, K, LocIndex(IExch), J);
-                R8 RVal;
+                Real RVal;
                 memcpy(&RVal, &Val, sizeof(ValType));
                 const I4 IBuff = ((L * NK + K) * NTotList + IExch) * NJ + J;
                 LocBuff(IBuff) = RVal;
@@ -456,7 +456,7 @@ class Halo {
                      const I4 IBuff =
                          ((L * NK + K) * NTotList + IExch) * NJ + J;
                      const ValType Val = Array(L, K, LocIndexH(IExch), J);
-                     R8 RVal;
+                     Real RVal;
                      memcpy(&RVal, &Val, sizeof(ValType));
                      LocBuffH(IBuff) = RVal;
                   }
@@ -494,7 +494,7 @@ class Halo {
              {NM, NL, NK, NTotList, NJ},
              KOKKOS_LAMBDA(int M, int L, int K, int IExch, int J) {
                 const ValType Val = Array(M, L, K, LocIndex(IExch), J);
-                R8 RVal;
+                Real RVal;
                 memcpy(&RVal, &Val, sizeof(ValType));
                 const I4 IBuff =
                     (((M * NL + L) * NK + K) * NTotList + IExch) * NJ + J;
@@ -513,7 +513,7 @@ class Halo {
                             (((M * NL + L) * NK + K) * NTotList + IExch) * NJ +
                             J;
                         const ValType Val = Array(M, L, K, LocIndexH(IExch), J);
-                        R8 RVal;
+                        Real RVal;
                         memcpy(&RVal, &Val, sizeof(ValType));
                         LocBuffH(IBuff) = RVal;
                      }
@@ -545,7 +545,7 @@ class Halo {
          parallelFor(
              {LocList.NTot}, KOKKOS_LAMBDA(int IExch) {
                 const I4 IArr = LocIndex(IExch);
-                const R8 RVal = LocBuff(IExch);
+                const Real RVal = LocBuff(IExch);
                 ValType Val;
                 memcpy(&Val, &RVal, sizeof(ValType));
                 Array(IArr) = Val;
@@ -555,7 +555,7 @@ class Halo {
          OMEGA_SCOPE(LocBuffH, Neighbors[CurNeighbor].RecvBufferH);
          for (int IExch = 0; IExch < LocList.NTot; ++IExch) {
             const I4 IArr = LocIndexH(IExch);
-            const R8 RVal = LocBuffH(IExch);
+            const Real RVal = LocBuffH(IExch);
             ValType Val;
             memcpy(&Val, &RVal, sizeof(ValType));
             Array(IArr) = Val;
@@ -584,7 +584,7 @@ class Halo {
              {LocList.NTot, NJ}, KOKKOS_LAMBDA(int IExch, int J) {
                 const I4 IBuff = IExch * NJ + J;
                 const I4 IArr  = LocIndex(IExch);
-                const R8 RVal  = LocBuff(IBuff);
+                const Real RVal  = LocBuff(IBuff);
                 ValType Val;
                 memcpy(&Val, &RVal, sizeof(ValType));
                 Array(IArr, J) = Val;
@@ -596,7 +596,7 @@ class Halo {
             for (int J = 0; J < NJ; ++J) {
                const I4 IBuff = IExch * NJ + J;
                const I4 IArr  = LocIndexH(IExch);
-               const R8 RVal  = LocBuffH(IBuff);
+               const Real RVal  = LocBuffH(IBuff);
                ValType Val;
                memcpy(&Val, &RVal, sizeof(ValType));
                Array(IArr, J) = Val;
@@ -629,7 +629,7 @@ class Halo {
              {NK, NTotList, NJ}, KOKKOS_LAMBDA(int K, int IExch, int J) {
                 const I4 IBuff = (K * NTotList + IExch) * NJ + J;
                 const I4 IArr  = LocIndex(IExch);
-                const R8 RVal  = LocBuff(IBuff);
+                const Real RVal  = LocBuff(IBuff);
                 ValType Val;
                 memcpy(&Val, &RVal, sizeof(ValType));
                 Array(K, IArr, J) = Val;
@@ -642,7 +642,7 @@ class Halo {
                for (int J = 0; J < NJ; ++J) {
                   const I4 IBuff = (K * LocList.NTot + IExch) * NJ + J;
                   const I4 IArr  = LocIndexH(IExch);
-                  const R8 RVal  = LocBuffH(IBuff);
+                  const Real RVal  = LocBuffH(IBuff);
                   ValType Val;
                   memcpy(&Val, &RVal, sizeof(ValType));
                   Array(K, IArr, J) = Val;
@@ -678,7 +678,7 @@ class Halo {
              KOKKOS_LAMBDA(int L, int K, int IExch, int J) {
                 const I4 IBuff = ((L * NK + K) * NTotList + IExch) * NJ + J;
                 const I4 IArr  = LocIndex(IExch);
-                const R8 RVal  = LocBuff(IBuff);
+                const Real RVal  = LocBuff(IBuff);
                 ValType Val;
                 memcpy(&Val, &RVal, sizeof(ValType));
                 Array(L, K, IArr, J) = Val;
@@ -693,7 +693,7 @@ class Halo {
                      const I4 IBuff =
                          ((L * NK + K) * NTotList + IExch) * NJ + J;
                      const I4 IArr = LocIndexH(IExch);
-                     const R8 RVal = LocBuffH(IBuff);
+                     const Real RVal = LocBuffH(IBuff);
                      ValType Val;
                      memcpy(&Val, &RVal, sizeof(ValType));
                      Array(L, K, IArr, J) = Val;
@@ -732,7 +732,7 @@ class Halo {
                 const I4 IBuff =
                     (((M * NL + L) * NK + K) * NTotList + IExch) * NJ + J;
                 const I4 IArr = LocIndex(IExch);
-                const R8 RVal = LocBuff(IBuff);
+                const Real RVal = LocBuff(IBuff);
                 ValType Val;
                 memcpy(&Val, &RVal, sizeof(ValType));
                 Array(M, L, K, IArr, J) = Val;
@@ -749,7 +749,7 @@ class Halo {
                             (((M * NL + L) * NK + K) * NTotList + IExch) * NJ +
                             J;
                         const I4 IArr = LocIndexH(IExch);
-                        const R8 RVal = LocBuffH(IBuff);
+                        const Real RVal = LocBuffH(IBuff);
                         ValType Val;
                         memcpy(&Val, &RVal, sizeof(ValType));
                         Array(M, L, K, IArr, J) = Val;
@@ -830,7 +830,7 @@ class Halo {
       startSends(UseDevBuffer);
 
       // Collect all send requests
-      std::vector<MPI_Request> SendReqs;
+      std::vector<AMPI_Request> SendReqs;
       for (int INghbr = 0; INghbr < NNghbr; ++INghbr) {
          if (SendFlags[CurElem][INghbr]) {
             SendReqs.push_back(Neighbors[INghbr].SReq);
@@ -853,7 +853,7 @@ class Halo {
          for (int INghbr = 0; INghbr < NNghbr; ++INghbr) {
             if (RecvFlags[CurElem][INghbr]) {
                if (!Neighbors[INghbr].Received) {
-                  MPI_Test(&Neighbors[INghbr].RReq, &Neighbors[INghbr].Received,
+                  AMPI_Test(&Neighbors[INghbr].RReq, &Neighbors[INghbr].Received,
                            MPI_STATUS_IGNORE);
                   if (Neighbors[INghbr].Received) {
                      ++NRcvd;
@@ -904,7 +904,7 @@ class Halo {
 
       Pacer::start("Halo:waitSends", 4);
       // Wait for all sends to complete before proceeding
-      MPI_Waitall(SendReqs.size(), SendReqs.data(), MPI_STATUS_IGNORE);
+      AMPI_Waitall(SendReqs.size(), SendReqs.data(), MPI_STATUS_IGNORE);
       Pacer::stop("Halo:waitSends", 4);
 
       // BUG: fails when there is no parent timer

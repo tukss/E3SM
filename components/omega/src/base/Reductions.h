@@ -14,10 +14,6 @@ using std::complex;
 #include "DataTypes.h"
 #include "OmegaKokkos.h"
 
-#ifdef USE_CODIPACK
-extern MpiTypes* mpiTypes;
-#endif
-
 namespace OMEGA {
 
 static int R8SumInitialized = 0;
