@@ -297,7 +297,8 @@ void Tendencies::readConfig(Config *OmegaConfig ///< [in] Omega config
    CHECK_ERROR_ABORT(
        Err, "Tendencies: BottomDragTendency Type not found in TendConfig");
 
-   Real BottomDragCoeff = 0.0_Real;
+   Real BottomDragCoeff = 0.0_PassiveReal;
+   BottomDragCoeff.setGradient(1.0);
    Err += BottomDragConfig.get("BottomDragCoeff", BottomDragCoeff);
    CHECK_ERROR_ABORT(Err, "Tendencies: BottomDragTendency BottomDragCoeff not "
                           "found in TendConfig");
@@ -308,7 +309,7 @@ void Tendencies::readConfig(Config *OmegaConfig ///< [in] Omega config
                   BottomDragType);
    }
 
-   this->ExplicitBottomDrag.Coeff              = BottomDragCoeff;
+   this->ExplicitBottomDrag.Coeff = BottomDragCoeff;
    this->VMix->VelVertMixSetup.BottomDragCoeff = BottomDragCoeff;
 
    if (BottomDragTendencyEnabled) {
@@ -379,8 +380,15 @@ void Tendencies::readConfig(Config *OmegaConfig ///< [in] Omega config
           "requires surface tracer forcing to be enabled.");
    }
 
-   this->SfcTracerForcing.IncludeShortWaveHeatFlux =
-       !this->PenetratingShortwave.Enabled;
+   Err += TendConfig->get("BottomDragCoeff", this->BottomDrag.Coeff);
+   this->BottomDrag.Coeff.setGradient(1.0);
+   CHECK_ERROR_ABORT(Err,
+                     "Tendencies: BottomDragCoeff not found in TendConfig");
+
+   Err += TendConfig->get("TracerHorzAdvTendencyEnable",
+                          this->TracerHorzAdv.Enabled);
+   CHECK_ERROR_ABORT(
+       Err, "Tendencies: TracerHorzAdvTendencyEnable not found in TendConfig");
 
    if (this->TracerDiffusion.Enabled) {
       Err += TendConfig.get("EddyDiff2", this->TracerDiffusion.EddyDiff2);
