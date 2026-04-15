@@ -1094,7 +1094,13 @@ void IOStream::writeFieldData(
    void *DataPtr;
    void *FillValPtr;
 
-   auto copy_view_to_arr = [](auto &d, const auto v, int ind, auto &&...R) {
+   auto copy_view_to_arr = [&FieldName](auto &d, const auto v, int ind, auto &&...R) {
+	   if constexpr(std::is_same_v<std::remove_reference_t<decltype(v(R...))>, Real>) {
+		   if(FieldName == "NormalVelocity") {
+			   Real &x = v(R...);
+			   std::cerr << "NormalVel: " << x.getValue() << " " << x.getGradient() << std::endl;
+		   }
+	   }
       d[ind] = getval<decltype(d[ind])>(v(R...));
    };
 

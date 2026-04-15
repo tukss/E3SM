@@ -187,6 +187,7 @@ void Tendencies::readTendConfig(
        Err, "Tendencies: BottomDragTendencyEnable not found in TendConfig");
 
    Err += TendConfig->get("BottomDragCoeff", this->BottomDrag.Coeff);
+   this->BottomDrag.Coeff.setGradient(1.0);
    CHECK_ERROR_ABORT(Err,
                      "Tendencies: BottomDragCoeff not found in TendConfig");
 
