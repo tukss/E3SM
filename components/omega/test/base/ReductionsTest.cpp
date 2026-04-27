@@ -16,7 +16,7 @@
 #include "Pacer.h"
 #include "Reductions.h"
 
-MpiTypes* mpiTypes;
+inline MpiTypes* mpiTypes;
 
 using namespace OMEGA;
 
