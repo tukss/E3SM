@@ -24,10 +24,6 @@
 
 #include <iostream>
 
-#ifdef USE_CODIPACK
-inline MpiTypes* mpiTypes;
-#endif
-
 using namespace OMEGA;
 
 //------------------------------------------------------------------------------
