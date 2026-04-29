@@ -173,7 +173,8 @@ void TestBroadcast(MachEnv *DefEnv, MachEnv *AltEnv, std::string TypeName) {
 int main(int argc, char *argv[]) {
 
    // Initialize the global MPI environment
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    MachEnv::init(MPI_COMM_WORLD);
    MachEnv *DefEnv  = MachEnv::getDefault();
    MPI_Comm DefComm = DefEnv->getComm();
@@ -221,8 +222,9 @@ int main(int argc, char *argv[]) {
    LOG_INFO("------ Broadcast Unit Tests Successful ------");
 
    // MPI_Status status;
-   MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
 
    return 0; // if we made it here, return a success code
 
