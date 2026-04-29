@@ -57,7 +57,7 @@ int main(int argc, char *argv[]) {
       if (SizeTmp != 8)
          ABORT_ERROR("DataTypesTest: FAIL Size of R8 ({}) is not 8", SizeTmp);
 
-      SizeTmp = sizeof(Real);
+      SizeTmp = sizeof(PassiveReal);
 #ifdef SINGLE_PRECISION
       if (SizeTmp != 4)
          ABORT_ERROR("DataTypesTest: FAIL Size of Real ({}) is not 4", SizeTmp);
