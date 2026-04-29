@@ -595,7 +595,8 @@ int main(int argc, char *argv[]) {
 
    int RetVal = 0;
 
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize(argc, argv);
 
    if (argc > 1 && std::string(argv[1]) == std::string("--perf")) {
@@ -605,8 +606,9 @@ int main(int argc, char *argv[]) {
    }
 
    Kokkos::finalize();
-   MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
 
    if (RetVal >= 256)
       RetVal = 255;
