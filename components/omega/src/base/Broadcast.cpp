@@ -253,7 +253,7 @@ void Broadcast(std::vector<Real> &Value, const MachEnv *InEnv, const int RankBca
 
    if (InEnv->isMember()) {
       Root   = (RankBcast < 0) ? InEnv->getMasterTask() : RankBcast;
-      RetVal = MPI_Bcast((void *)Value.data(), Value.size(), MPI_DOUBLE, Root,
+      RetVal = AMPI_Bcast((Real *)Value.data(), Value.size(), mpiTypes->MPI_TYPE, Root,
                          InEnv->getComm());
       if (RetVal != MPI_SUCCESS)
          ABORT_ERROR("Broadcast R8 vector: Error in MPI Broadcast");
