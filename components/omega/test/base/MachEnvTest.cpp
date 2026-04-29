@@ -61,7 +61,8 @@ void initMachEnvs() {
 int main(int argc, char *argv[]) {
 
    // Initialize the global MPI environment
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
 
    // Create reference values based on MPI_COMM_WORLD
    int WorldTask;
@@ -355,7 +356,8 @@ int main(int argc, char *argv[]) {
    LOG_INFO("------ MachEnv Unit Tests Successful ------");
 
    // MPI_Status status;
-   MPI_Finalize();
+   delete mpiTypes;
+   AMPI_Finalize();
 
    return 0; // if we made it here, we were successful
 

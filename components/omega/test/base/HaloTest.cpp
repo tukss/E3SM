@@ -136,7 +136,8 @@ int main(int argc, char *argv[]) {
    I4 IErr   = 0;
 
    // Initialize global MPI environment and Kokkos
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize();
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -569,7 +570,8 @@ int main(int argc, char *argv[]) {
    }
    Pacer::finalize();
    Kokkos::finalize();
-   MPI_Finalize();
+   delete mpiTypes;
+   AMPI_Finalize();
 
    if (TotErr >= 256)
       TotErr = 255;

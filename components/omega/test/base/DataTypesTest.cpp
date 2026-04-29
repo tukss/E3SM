@@ -25,7 +25,8 @@ using namespace OMEGA;
 int main(int argc, char *argv[]) {
 
    // initialize environments
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize();
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -957,7 +958,8 @@ int main(int argc, char *argv[]) {
    LOG_INFO("------ DataTypes Unit Tests Successful ------");
    Pacer::finalize();
    Kokkos::finalize();
-   MPI_Finalize();
+   delete mpiTypes;
+   AMPI_Finalize();
 
    return 0; // if we made it here, return successfully
 
