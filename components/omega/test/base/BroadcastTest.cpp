@@ -37,7 +37,7 @@ void TestBroadcast(MachEnv *DefEnv, MachEnv *AltEnv, std::string TypeName) {
       ToVal   = "b";
 
 #ifdef USE_CODIPACK
-   } if constexpr (std::is_same_v<MyType, codi::RealReverse>) {
+   } else if constexpr (std::is_same_v<MyType, codi::RealReverse>) {
       FromVal.setValue(1);
       ToVal.setValue(-1);
 #endif
