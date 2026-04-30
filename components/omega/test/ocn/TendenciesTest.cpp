@@ -255,7 +255,8 @@ int main(int argc, char *argv[]) {
 
    int RetVal = 0;
 
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize(argc, argv);
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -264,7 +265,8 @@ int main(int argc, char *argv[]) {
 
    Pacer::finalize();
    Kokkos::finalize();
-   MPI_Finalize();
+   delete mpiTypes;
+   AMPI_Finalize();
 
    if (RetVal >= 256)
       RetVal = 255;
