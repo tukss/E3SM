@@ -188,7 +188,11 @@ void VertCoord::completeSetup(Config *Options //< [in] configuration options
              {BottomDepth.extent_int(0)},
              KOKKOS_LAMBDA(int I, Real &Accum) { Accum += LocBottomDepth(I); },
              Sum3);
-         if (Sum3 < 0.) {
+         if (Sum3
+#ifdef USE_CODIPACK
+             .getValue()
+#endif
+             < 0.) {
             ABORT_ERROR("VertCoord: Error reading bottomDepth from {}",
                         StreamName);
          }
