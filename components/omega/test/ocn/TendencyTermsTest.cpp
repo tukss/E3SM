@@ -40,6 +40,7 @@
 #include <limits>
 #include <string>
 #include <vector>
+#include <type_traits>
 
 using namespace OMEGA;
 
@@ -2200,7 +2201,7 @@ int tendencyTermsTest(const std::string &MeshFile = DefaultMeshFile) {
 
    int NTracers = Tracers::getNumTracers();
 
-   const Real RTol = sizeof(Real) == 4 ? 2e-2 : 1e-5;
+   const Real RTol = std::is_same_v<float, PassiveReal> ? 2e-2 : 1e-5;
 
    Err += testThickFluxDiv(NVertLayers, RTol);
 
