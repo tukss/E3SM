@@ -204,7 +204,8 @@ int main(int argc, char **argv) {
    int ErrRef = 0;
 
    // Initialize the global MPI and Kokkos environments
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize();
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -336,6 +337,9 @@ int main(int argc, char **argv) {
    Decomp::clear();
    Pacer::finalize();
    Kokkos::finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
 
    CHECK_ERROR_ABORT(Err, "IOStream Unit Tests: FAIL");
    LOG_INFO("------ IOStream Unit Tests successful ------");

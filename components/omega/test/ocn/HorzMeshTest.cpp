@@ -151,7 +151,8 @@ R8 coriolis(R8 Lat) {
 int main(int argc, char *argv[]) {
 
    // Initialize the global MPI environment
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize();
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -744,8 +745,10 @@ int main(int argc, char *argv[]) {
 
    // Success if we made it here
    LOG_INFO("------ Horz Mesh unit tests successful ------");
-   MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
+   AMPI_Finalize();
 
    // Return success if we made it here
    return 0;

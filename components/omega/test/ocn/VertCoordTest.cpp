@@ -85,7 +85,8 @@ int main(int argc, char *argv[]) {
    Error ErrAll;
 
    // Initialize the global MPI environment
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize();
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -780,8 +781,9 @@ int main(int argc, char *argv[]) {
 
    CHECK_ERROR_ABORT(ErrAll, "VertCoord unit tests FAIL");
 
-   MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
 
    return 0;
 

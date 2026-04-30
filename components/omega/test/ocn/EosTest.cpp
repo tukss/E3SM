@@ -1589,7 +1589,8 @@ void eosTest(const std::string &MeshFile = "OmegaMesh.nc") {
 // The test driver for Eos testing
 int main(int argc, char *argv[]) {
 
-   MPI_Init(&argc, &argv);
+   AMPI_Init(&argc, &argv);
+   mpiTypes = new MpiTypes();
    Kokkos::initialize(argc, argv);
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -1601,7 +1602,8 @@ int main(int argc, char *argv[]) {
    Pacer::finalize();
    Kokkos::finalize();
    MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   delete mpiTypes;
+   AMPI_Finalize();
 
    // If we made it here, test is successful
    return 0;
