@@ -27,8 +27,6 @@
 #include <codi.hpp>
 #include <codi/tools/mpi/codiMpiTypes.hpp>
  
-#include <iostream>
- 
 using namespace medi;
 using MpiTypes = codi::CoDiMpiTypes<codi::RealForward>;
 
