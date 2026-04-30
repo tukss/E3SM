@@ -28,9 +28,6 @@
 #include <codi/tools/mpi/codiMpiTypes.hpp>
  
 using namespace medi;
-using MpiTypes = codi::CoDiMpiTypes<codi::RealForward>;
-
-inline MpiTypes* mpiTypes;
 
 #endif
 
@@ -44,12 +41,12 @@ using R8 = double;       ///< alias for 64-bit (double prec) real
 
 /// generic real 64-bit (default) or 32-bit (if -DSINGLE_PRECISION used)
 #ifdef USE_CODIPACK
-using Real = codi::RealForward;
 #ifdef OMEGA_SINGLE_PRECISION
 using PassiveReal = float;
 #else
 using PassiveReal = double;
 #endif
+using Real = codi::RealForwardGen<PassiveReal, PassiveReal>;
 #else
 #ifdef OMEGA_SINGLE_PRECISION
 using Real = float;
@@ -165,6 +162,12 @@ namespace Kokkos {
   KOKKOS_CODI_MATH(exp);
 #undef KOKKOS_CODI_MATH
 }
+#endif
+
+#ifdef USE_MEDIPACK
+using MpiTypes = codi::CoDiMpiTypes<OMEGA::Real>;
+
+inline MpiTypes* mpiTypes;
 #endif
 
 //===----------------------------------------------------------------------===//
