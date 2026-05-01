@@ -406,7 +406,7 @@ int main(int argc, char *argv[]) {
    int RetVal = 0;
 
    AMPI_Init(&argc, &argv);
-   new MpiTypes();
+   mpiTypes = new MpiTypes();
    Kokkos::initialize(argc, argv);
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
