@@ -32,7 +32,8 @@ int main(int argc, char **argv) {
 #endif
 
 
-   MPI_Init(&argc, &argv); // initialize MPI
+   AMPI_Init(&argc, &argv); // initialize MPI
+   mpiTypes = new MpiTypes;
    Kokkos::initialize();   // initialize Kokkos
    Pacer::initialize(MPI_COMM_WORLD);
    Pacer::setPrefix("Omega:");
@@ -76,8 +77,9 @@ int main(int argc, char **argv) {
    Pacer::finalize();
 
    Kokkos::finalize();
-   MPI_Barrier(MPI_COMM_WORLD);
-   MPI_Finalize();
+   AMPI_Barrier(MPI_COMM_WORLD);
+   delete mpiTypes;
+   AMPI_Finalize();
 
    if (ErrAll >= 256)
       ErrAll = 255;
