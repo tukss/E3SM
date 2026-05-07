@@ -410,9 +410,11 @@ void TimeStepper::updateVelocityByTend(OceanState *State1, int TimeLevel1,
 
    Array2DReal NormalVel1;
    Array2DReal NormalVel2;
+   Array2DReal NormalVel_dx;
    I4 Err;
    Err = State1->getNormalVelocity(NormalVel1, TimeLevel1);
    Err = State2->getNormalVelocity(NormalVel2, TimeLevel2);
+   Err = State1->getNormalVelocity_dx(NormalVel_dx, TimeLevel1);
    if (Err != 0)
       ABORT_ERROR("TimeStepper updateVelocity: error retrieving velocity");
    const auto &NormalVelTend = Tend->NormalVelocityTend;
@@ -426,6 +428,7 @@ void TimeStepper::updateVelocityByTend(OceanState *State1, int TimeLevel1,
        KOKKOS_LAMBDA(int IEdge, int K) {
           NormalVel1(IEdge, K) =
               NormalVel2(IEdge, K) + CoeffSeconds * NormalVelTend(IEdge, K);
+	  NormalVel_dx(IEdge, K) = NormalVel1(IEdge, K).getGradient();
        });
 }
 
