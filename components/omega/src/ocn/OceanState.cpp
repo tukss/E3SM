@@ -319,6 +319,33 @@ I4 OceanState::getNormalVelocityH(HostArray2DReal &NormVelH,
 }
 
 //------------------------------------------------------------------------------
+// Get normal velocity derivative host array
+I4 OceanState::getNormalVelocity_dx_H(HostArray2DReal &NormVel_dx_H,
+                                  const I4 TimeLevel) const {
+   I4 Err = 0;
+   I4 TimeIndex;
+
+   Err      = getTimeIndex(TimeIndex, TimeLevel);
+   NormVel_dx_H = NormalVelocity_dx_H[TimeIndex];
+
+   return Err;
+}
+
+//
+// Get normal velocity derivative device array
+I4 OceanState::getNormalVelocity_dx(Array2DReal &NormVel_dx,
+                                 const I4 TimeLevel) const {
+
+   I4 Err = 0;
+   I4 TimeIndex;
+
+   Err     = getTimeIndex(TimeIndex, TimeLevel);
+   NormVel_dx = NormalVelocity_dx[TimeIndex];
+
+   return Err;
+}
+
+//------------------------------------------------------------------------------
 // Perform copy to device for state variables
 // TimeLevel == [1:new, 0:current, -1:previous, -2:two times ago, ...]
 I4 OceanState::copyToDevice(const I4 TimeLevel) {
