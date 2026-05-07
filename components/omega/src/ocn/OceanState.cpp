@@ -110,17 +110,21 @@ OceanState::OceanState(
    // Allocate state host arrays
    PseudoThicknessH.resize(NTimeLevels);
    NormalVelocityH.resize(NTimeLevels);
+   NormalVelocity_dx_H.resize(NTimeLevels);
 
    for (int I = 0; I < NTimeLevels; I++) {
       PseudoThicknessH[I] = HostArray2DReal(
           "PseudoThickness" + std::to_string(I), NCellsSize, NVertLayers);
       NormalVelocityH[I] = HostArray2DReal("NormalVelocity" + std::to_string(I),
                                            NEdgesSize, NVertLayers);
+      NormalVelocity_dx_H[I] = HostArray2DReal("NormalVelocity_dx" + std::to_string(I),
+                                           NEdgesSize, NVertLayers);
    }
 
    // Allocate state device arrays
    PseudoThickness.resize(NTimeLevels);
    NormalVelocity.resize(NTimeLevels);
+   NormalVelocity_dx.resize(NTimeLevels);
 
    // Create device arrays and copy host data
    for (int I = 0; I < NTimeLevels; I++) {
@@ -128,6 +132,8 @@ OceanState::OceanState(
                                        NCellsSize, NVertLayers);
       NormalVelocity[I]  = Array2DReal("NormalVelocity" + std::to_string(I),
                                        NEdgesSize, NVertLayers);
+      NormalVelocity_dx[I] = Array2DReal("NormalVelocity_dx" + std::to_string(I),
+                                      NEdgesSize, NVertLayers);      
    }
 
    // The split velocity and barotropic pressure are only carried by the
@@ -225,6 +231,7 @@ OceanState::~OceanState() {
    FieldGroup::destroy(StateGroupName);
    Field::destroy(PseudoThicknessFldName);
    Field::destroy(NormalVelocityFldName);
+   Field::destroy(NormalVelocity_dx_FldName);
    if (UseModeSplit) {
       Field::destroy(NormalBaroclinicVelocityFldName);
       Field::destroy(NormalBarotropicVelocityFldName);
@@ -257,6 +264,7 @@ void OceanState::defineFields() {
 
    PseudoThicknessFldName           = "PseudoThickness";
    NormalVelocityFldName            = "NormalVelocity";
+   NormalVelocity_dx_FldName = "NormalVelocity_dx";
    NormalBaroclinicVelocityFldName  = "NormalBaroclinicVelocity";
    NormalBarotropicVelocityFldName  = "NormalBarotropicVelocity";
    BarotropicPressureAnomalyFldName = "BarotropicPressureAnomaly";
@@ -264,6 +272,7 @@ void OceanState::defineFields() {
    if (Name != "Default") {
       PseudoThicknessFldName.append(Name);
       NormalVelocityFldName.append(Name);
+      NormalVelocity_dx_FldName.append(Name);
       NormalBaroclinicVelocityFldName.append(Name);
       NormalBarotropicVelocityFldName.append(Name);
       BarotropicPressureAnomalyFldName.append(Name);
@@ -283,6 +292,18 @@ void OceanState::defineFields() {
                      9.99E+10,                            // max valid value
                      NDims,   // number of dimensions
                      DimNames // dimension names
+       );
+   auto NormalVelocity_dx_Field =
+       Field::create(NormalVelocity_dx_FldName,               // field name
+                     "derivative Velocity component normal to edge", // long Name
+								     // fix the next two
+                     "m/s",                               // units
+                     "sea_water_velocity",                // CF standard Name
+                     -9.99E+10,                           // min valid value
+                     9.99E+10,                            // max valid value
+                     -9.99E+30, // scalar for undefined entries
+                     NDims,     // number of dimensions
+                     DimNames   // dimension names
        );
 
    DimNames[0] = "NCells";
@@ -342,6 +363,7 @@ void OceanState::defineFields() {
       auto RestartGroup = FieldGroup::create("Restart");
 
    StateGroup->addField(NormalVelocityFldName);
+   //StateGroup->addField(NormalVelocity_dx_FldName);
    StateGroup->addField(PseudoThicknessFldName);
 
    FieldGroup::addFieldToGroup(NormalVelocityFldName, "Restart");
@@ -351,6 +373,7 @@ void OceanState::defineFields() {
    const I4 TimeIndex = getTimeIndex(0);
 
    NormalVelocityField->attachData<Array2DReal>(NormalVelocity[TimeIndex]);
+   NormalVelocity_dx_Field->attachData<Array2DReal>(NormalVelocity_dx[TimeIndex]);
    PseudoThicknessField->attachData<Array2DReal>(PseudoThickness[TimeIndex]);
 
    if (UseModeSplit) {
@@ -474,6 +497,7 @@ void OceanState::copyToDevice(const I4 TimeLevel) {
 
    deepCopy(PseudoThickness[TimeIndex], PseudoThicknessH[TimeIndex]);
    deepCopy(NormalVelocity[TimeIndex], NormalVelocityH[TimeIndex]);
+   deepCopy(NormalVelocity_dx[TimeIndex], NormalVelocity_dx_H[TimeIndex]);
    if (UseModeSplit) {
       deepCopy(NormalBaroclinicVelocity[TimeIndex],
                NormalBaroclinicVelocityH[TimeIndex]);
@@ -493,6 +517,7 @@ void OceanState::copyToHost(const I4 TimeLevel) {
 
    deepCopy(PseudoThicknessH[TimeIndex], PseudoThickness[TimeIndex]);
    deepCopy(NormalVelocityH[TimeIndex], NormalVelocity[TimeIndex]);
+   deepCopy(NormalVelocity_dx_H[TimeIndex], NormalVelocity_dx[TimeIndex]);
    if (UseModeSplit) {
       deepCopy(NormalBaroclinicVelocityH[TimeIndex],
                NormalBaroclinicVelocity[TimeIndex]);
@@ -527,6 +552,7 @@ void OceanState::exchangeHalo(const I4 TimeLevel) {
 
    MeshHalo->exchangeFullArrayHalo(PseudoThickness[TimeIndex], OnCell);
    MeshHalo->exchangeFullArrayHalo(NormalVelocity[TimeIndex], OnEdge);
+   MeshHalo->exchangeFullArrayHalo(NormalVelocity_dx[TimeIndex], OnEdge);
    if (UseModeSplit) {
       MeshHalo->exchangeFullArrayHalo(NormalBaroclinicVelocity[TimeIndex],
                                       OnEdge);

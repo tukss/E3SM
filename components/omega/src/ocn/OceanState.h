@@ -93,6 +93,9 @@ class OceanState {
    std::vector<Array2DReal> NormalVelocity; ///< Device NormalVelocity array
    std::vector<HostArray2DReal> NormalVelocityH; ///< Host NormalVelocity array
 
+   std::vector<Array2DReal> NormalVelocity_dx; ///< Device NormalVelocity_dx array
+   std::vector<HostArray2DReal> NormalVelocity_dx_H; ///< Host NormalVelocity_dx array
+
    std::vector<Array2DReal>
        NormalBaroclinicVelocity; ///< Device baroclinic velocity array
    std::vector<HostArray2DReal>
@@ -112,6 +115,7 @@ class OceanState {
    // These are appended with the State name for non-Default state instances
    std::string PseudoThicknessFldName; ///< Field name for PseudoThickness
    std::string NormalVelocityFldName;  ///< Field name for NormalVelocity
+   std::string NormalVelocity_dx_FldName; ///< Field name for NormalVelocity_dx
    std::string NormalBaroclinicVelocityFldName;  ///< Field name for
                                                  ///< NormalBaroclinicVelocity
    std::string NormalBarotropicVelocityFldName;  ///< Field name for
@@ -175,6 +179,12 @@ class OceanState {
 
    /// Get barotropic pressure anomaly host array at given time level
    HostArray1DReal getBarotropicPressureAnomalyH(const I4 TimeLevel) const;
+
+   /// Get normal velocity device array at given time level
+   I4 getNormalVelocity_dx(Array2DReal &NormVel_dx, const I4 TimeLevel) const;
+
+   /// Get normal velocity host array at given time level
+   I4 getNormalVelocity_dx_H(HostArray2DReal &NormVel_dx_H, const I4 TimeLevel) const;
 
    /// Exchange halo
    void exchangeHalo(const I4 TimeLevel);
