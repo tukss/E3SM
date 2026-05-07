@@ -743,6 +743,7 @@ void TimeStepper::updateVelocityByTend(OceanState *State1, int TimeLevel1,
 
    Array2DReal NormalVel1 = State1->getNormalVelocity(TimeLevel1);
    Array2DReal NormalVel2 = State2->getNormalVelocity(TimeLevel2);
+   Array2DReal NormalVel_dx = State1->getNormalVelocity_dx(TimeLevel1);
 
    R8 CoeffSeconds;
    Coeff.get(CoeffSeconds, TimeUnits::Seconds);
@@ -761,6 +762,7 @@ void TimeStepper::updateVelocityByTend(OceanState *State1, int TimeLevel1,
               Team, Range{KMin, KMax}, INNER_LAMBDA(int K) {
                  NormalVel1(IEdge, K) = NormalVel2(IEdge, K) +
                                         CoeffSeconds * NormalVelTend(IEdge, K);
+                 NormalVel_dx(IEdge, K) = NormalVel1(IEdge, K).getGradient();
               });
        });
    // Zero boundary layers; updateVelocityByTend only writes [KMin,KMax], so
