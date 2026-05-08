@@ -24,6 +24,7 @@
 #include <cstddef>
 #include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -1098,7 +1099,8 @@ void IOStream::writeFieldData(
 	   if constexpr(std::is_same_v<std::remove_reference_t<decltype(v(R...))>, Real>) {
 		   if(FieldName == "NormalVelocity") {
 			   Real &x = v(R...);
-			   std::cerr << "NormalVel: " << x.getValue() << " " << x.getGradient() << std::endl;
+			   auto prec = std::cerr.precision();
+			   std::cerr << "NormalVel: " << std::setprecision(17) << x.getValue() << " " << x.getGradient() << std::setprecision(prec) << std::endl;
 		   }
 	   }
       d[ind] = getval<decltype(d[ind])>(v(R...));
