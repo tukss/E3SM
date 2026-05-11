@@ -35,6 +35,10 @@
 #include <typeinfo>
 #include <variant>
 
+static bool ends_with(std::string_view str, std::string_view suffix) {
+   return str.size() >= suffix.size() && str.compare(str.size()-suffix.size(), suffix.size(), suffix) == 0;
+}
+
 namespace OMEGA {
 
 // Create static class members
@@ -1096,14 +1100,21 @@ void IOStream::writeFieldData(
    void *FillValPtr;
 
    auto copy_view_to_arr = [&FieldName](auto &d, const auto v, int ind, auto &&...R) {
-	   if constexpr(std::is_same_v<std::remove_reference_t<decltype(v(R...))>, Real>) {
-		   if(FieldName == "NormalVelocity") {
-			   Real &x = v(R...);
-			   auto prec = std::cerr.precision();
-			   std::cerr << "NormalVel: " << std::setprecision(17) << x.getValue() << " " << x.getGradient() << std::setprecision(prec) << std::endl;
-		   }
-	   }
-      d[ind] = getval<decltype(d[ind])>(v(R...));
+      if constexpr(std::is_same_v<std::remove_reference_t<decltype(v(R...))>, Real>) {
+	 if(FieldName == "NormalVelocity") {
+	    Real &x = v(R...);
+	    auto prec = std::cerr.precision();
+	    std::cerr << "NormalVel: " << std::setprecision(17) << x.getValue() << " " << x.getGradient() << std::setprecision(prec) << std::endl;
+	 }
+	 if(ends_with(FieldName, "_dx")) {
+	    Real &x = v(R...);
+	    auto prec = std::cerr.precision();
+	    std::cerr << "NormalVel_dx: " << std::setprecision(17) << x.getValue() << " " << x.getGradient() << std::setprecision(prec) << std::endl;
+	    d[ind] = v(R...).getGradient();
+	 }
+	 else d[ind] = getval<decltype(d[ind])>(v(R...));
+      }
+      else d[ind] = getval<decltype(d[ind])>(v(R...));
    };
 
    switch (MyType) {

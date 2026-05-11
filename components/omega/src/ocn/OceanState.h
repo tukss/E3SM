@@ -88,9 +88,6 @@ class OceanState {
    std::vector<Array2DReal> NormalVelocity; ///< Device NormalVelocity array
    std::vector<HostArray2DReal> NormalVelocityH; ///< Host NormalVelocity array
 
-   std::vector<Array2DReal> NormalVelocity_dx; ///< Device NormalVelocity_dx array
-   std::vector<HostArray2DReal> NormalVelocity_dx_H; ///< Host NormalVelocity_dx array
-
    // Field names
    // These are appended with the State name for non-Default state instances
    std::string LayerThicknessFldName; ///< Field name for LayerThickness
