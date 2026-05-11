@@ -1108,8 +1108,6 @@ void IOStream::writeFieldData(
 	 }
 	 if(ends_with(FieldName, "_dx")) {
 	    Real &x = v(R...);
-	    auto prec = std::cerr.precision();
-	    std::cerr << "NormalVel_dx: " << std::setprecision(17) << x.getValue() << " " << x.getGradient() << std::setprecision(prec) << std::endl;
 	    d[ind] = v(R...).getGradient();
 	 }
 	 else d[ind] = getval<decltype(d[ind])>(v(R...));
