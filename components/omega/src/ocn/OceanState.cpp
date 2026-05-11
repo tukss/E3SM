@@ -34,7 +34,7 @@ int OceanState::init() {
 
    int Err = 0; // default successful return code
 
-   // Retrieve the default decomposition and mesh
+   // Retrieve the default decomposition and mesh^
    Decomp *DefDecomp     = Decomp::getDefault();
    HorzMesh *DefHorzMesh = HorzMesh::getDefault();
    OMEGA_REQUIRE(DefHorzMesh,
@@ -110,21 +110,17 @@ OceanState::OceanState(
    // Allocate state host arrays
    PseudoThicknessH.resize(NTimeLevels);
    NormalVelocityH.resize(NTimeLevels);
-   NormalVelocity_dx_H.resize(NTimeLevels);
 
    for (int I = 0; I < NTimeLevels; I++) {
       PseudoThicknessH[I] = HostArray2DReal(
           "PseudoThickness" + std::to_string(I), NCellsSize, NVertLayers);
       NormalVelocityH[I] = HostArray2DReal("NormalVelocity" + std::to_string(I),
                                            NEdgesSize, NVertLayers);
-      NormalVelocity_dx_H[I] = HostArray2DReal("NormalVelocity_dx" + std::to_string(I),
-                                           NEdgesSize, NVertLayers);
    }
 
    // Allocate state device arrays
    PseudoThickness.resize(NTimeLevels);
    NormalVelocity.resize(NTimeLevels);
-   NormalVelocity_dx.resize(NTimeLevels);
 
    // Create device arrays and copy host data
    for (int I = 0; I < NTimeLevels; I++) {
@@ -132,8 +128,6 @@ OceanState::OceanState(
                                        NCellsSize, NVertLayers);
       NormalVelocity[I]  = Array2DReal("NormalVelocity" + std::to_string(I),
                                        NEdgesSize, NVertLayers);
-      NormalVelocity_dx[I] = Array2DReal("NormalVelocity_dx" + std::to_string(I),
-                                      NEdgesSize, NVertLayers);      
    }
 
    // The split velocity and barotropic pressure are only carried by the
@@ -373,6 +367,7 @@ void OceanState::defineFields() {
    const I4 TimeIndex = getTimeIndex(0);
 
    NormalVelocityField->attachData<Array2DReal>(NormalVelocity[TimeIndex]);
+   NormalVelocity_dx_Field->attachData<Array2DReal>(NormalVelocity[TimeIndex]);
    NormalVelocity_dx_Field->attachData<Array2DReal>(NormalVelocity_dx[TimeIndex]);
    PseudoThicknessField->attachData<Array2DReal>(PseudoThickness[TimeIndex]);
 
@@ -496,7 +491,7 @@ I4 OceanState::getNormalVelocity_dx_H(HostArray2DReal &NormVel_dx_H,
    I4 TimeIndex;
 
    Err      = getTimeIndex(TimeIndex, TimeLevel);
-   NormVel_dx_H = NormalVelocity_dx_H[TimeIndex];
+   NormVel_dx_H = NormalVelocityH[TimeIndex];
 
    return Err;
 }
@@ -510,7 +505,7 @@ I4 OceanState::getNormalVelocity_dx(Array2DReal &NormVel_dx,
    I4 TimeIndex;
 
    Err     = getTimeIndex(TimeIndex, TimeLevel);
-   NormVel_dx = NormalVelocity_dx[TimeIndex];
+   NormVel_dx = NormalVelocity[TimeIndex];
 
    return Err;
 }
@@ -524,7 +519,6 @@ void OceanState::copyToDevice(const I4 TimeLevel) {
 
    deepCopy(PseudoThickness[TimeIndex], PseudoThicknessH[TimeIndex]);
    deepCopy(NormalVelocity[TimeIndex], NormalVelocityH[TimeIndex]);
-   deepCopy(NormalVelocity_dx[TimeIndex], NormalVelocity_dx_H[TimeIndex]);
    if (UseModeSplit) {
       deepCopy(NormalBaroclinicVelocity[TimeIndex],
                NormalBaroclinicVelocityH[TimeIndex]);
@@ -544,7 +538,6 @@ void OceanState::copyToHost(const I4 TimeLevel) {
 
    deepCopy(PseudoThicknessH[TimeIndex], PseudoThickness[TimeIndex]);
    deepCopy(NormalVelocityH[TimeIndex], NormalVelocity[TimeIndex]);
-   deepCopy(NormalVelocity_dx_H[TimeIndex], NormalVelocity_dx[TimeIndex]);
    if (UseModeSplit) {
       deepCopy(NormalBaroclinicVelocityH[TimeIndex],
                NormalBaroclinicVelocity[TimeIndex]);
@@ -579,7 +572,6 @@ void OceanState::exchangeHalo(const I4 TimeLevel) {
 
    MeshHalo->exchangeFullArrayHalo(PseudoThickness[TimeIndex], OnCell);
    MeshHalo->exchangeFullArrayHalo(NormalVelocity[TimeIndex], OnEdge);
-   MeshHalo->exchangeFullArrayHalo(NormalVelocity_dx[TimeIndex], OnEdge);
    if (UseModeSplit) {
       MeshHalo->exchangeFullArrayHalo(NormalBaroclinicVelocity[TimeIndex],
                                       OnEdge);
@@ -608,6 +600,8 @@ void OceanState::updateTimeLevels() {
    // just-computed state with fill values; this is a pointer update only.
    Field::attachFieldData<Array2DReal>(NormalVelocityFldName,
                                        NormalVelocity[CurTimeIndex], false);
+   Field::attachFieldData<Array2DReal>(NormalVelocity_dx_FldName,
+                                       NormalVelocity[CurTimeIndex]);
    Field::attachFieldData<Array2DReal>(PseudoThicknessFldName,
                                        PseudoThickness[CurTimeIndex], false);
    if (UseModeSplit) {
